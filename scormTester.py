@@ -177,17 +177,18 @@ def runChecks(path):
             print("Error saving report - file may be open")
             clearLabels()
             setLabelStatus('Report could not be saved (maybe open?)', '#fe5f55')
-    # check media files with exiftool
-    if checkbox_media_test.get():
-        mediainfo.checkMediaFiles([path])
-    else:
-        print("Media files check disabled.")
+    return path
 
 def selectFiles():
     root.filenames = filedialog.askopenfilenames(initialdir="/", title="Select file", filetypes=(("all files", "*.*"), ("all files", "*.*")))
     if len(root.filenames) == 1:
         print("FILE: " + str(root.filenames))
-        runChecks(sz.extractScorm(root.filenames[0]))
+        media_path = runChecks(sz.extractScorm(root.filenames[0]))
+        if checkbox_media_test.get():
+            mediainfo.checkMediaFiles([media_path])
+        else:
+            print("Media files check disabled.")
+
     # MULTIPLE FILES SELECTED
     elif len(root.filenames) > 1:
         global multi_files_select, report_path, report_saved
@@ -197,7 +198,11 @@ def selectFiles():
         for i in root.filenames:
             print("FILE: " + str(i))
             clearLabels()
-            runChecks(sz.extractScorm(i))
+            media_path = runChecks(sz.extractScorm(i))
+            if checkbox_media_test.get():
+                mediainfo.checkMediaFiles([media_path])
+            else:
+                print("Media files check disabled.")
 
 def clearLabels():
     label_scorm = tk.Label(root, textvariable="", anchor="w")

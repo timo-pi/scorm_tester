@@ -48,12 +48,18 @@ def write_to_excel(media_data, unzip_dir):
         ws.append(rows)
     report_filename = 'MEDIA-REPORT_' + os.path.basename(os.path.dirname(unzip_dir + "/imsmanifest.xml") + '.xlsx')
     print("REPORT-Filename: " + report_filename)
+
+    # add filter
+    ws.auto_filter.ref = "A1:T1000"
+    ws.auto_filter.add_filter_column(0, ['file path', 'file size KiB', 'file type', 'MIME Type', 'image width', 'image height', 'image size', 'Megapixels', 'media duration', 'compressor name', 'frame rate', 'avg. bitrate', 'Encoder', 'Video Frame Rate', 'Major Brand', 'Duration', 'Compressor ID', 'Track Duration', 'Compatible Brands', 'Encoding Process'])
+    ws.auto_filter.add_sort_condition("B2:B1000")
+
     wb.save(report_filename)
     os.chdir(restore_cwd)
 
 def filter_report(report, file_paths):
     print("Filtering media data for report.")
-    data_final = [['file path', 'file size', 'file type', 'MIME Type', 'image width', 'image height', 'image size', 'Megapixels', 'media duration', 'compressor name', 'frame rate', 'avg. bitrate', 'Encoder', 'Video Frame Rate', 'Major Brand', 'Duration', 'Compressor ID', 'Track Duration', 'Compatible Brands', 'Encoding Process']]
+    data_final = [['file path', 'file size KiB', 'file type', 'MIME Type', 'image width', 'image height', 'image size', 'Megapixels', 'media duration', 'compressor name', 'frame rate', 'avg. bitrate', 'Encoder', 'Video Frame Rate', 'Major Brand', 'Duration', 'Compressor ID', 'Track Duration', 'Compatible Brands', 'Encoding Process']]
     # convert to dictionary
     file_counter = 0
     for media_file in report:
@@ -61,20 +67,21 @@ def filter_report(report, file_paths):
         data_dict = {}
         for data in media_file:
             data_dict[data[0]] = data[1]
-            #data_dict = {data[0]: data[1]}
-            #print(data[0], " *** ", data[1])
-            #row.append(data[0])
-            #row.append(data[1])
         try:
             row.append(file_paths[file_counter])
             file_counter += 1
         except:
             print("Warning: No more file paths to grab!")
-        row.append(data_dict.get('File Size')) if 'File Size' in data_dict else row.append("")
+
+        if "MiB" in data_dict.get('File Size'):
+            row.append(float(data_dict.get('File Size').replace(' MiB', '').replace('.', ''))*1000)
+        else:
+            row.append(float(data_dict.get('File Size').replace(' KiB', '')))
+        #row.append(float(data_dict.get('File Size').replace(' KiB', '').replace(' MiB', ''))) if 'File Size' in data_dict else row.append("")
         row.append(data_dict.get('File Type')) if 'File Type' in data_dict else row.append("")
         row.append(data_dict.get('MIME Type')) if 'MIME Type' in data_dict else row.append(" ")
-        row.append(data_dict.get('Image Width')) if 'Image Width' in data_dict else row.append(" ")
-        row.append(data_dict.get('Image Height')) if 'Image Height' in data_dict else row.append(" ")
+        row.append(data_dict.get('Image Width').replace("'", "")) if 'Image Width' in data_dict else row.append(" ")
+        row.append(data_dict.get('Image Height').replace("'", "")) if 'Image Height' in data_dict else row.append(" ")
         row.append(data_dict.get('Image Size')) if 'Image Size' in data_dict else row.append(" ")
         row.append(data_dict.get('Megapixels')) if 'Megapixels' in data_dict else row.append(" ")
         row.append(data_dict.get('Media Duration')) if 'Media Duration' in data_dict else row.append(" ")
@@ -114,17 +121,17 @@ def checkMediaFiles(directories):
             for file in filenames:
                 # search for images, videos, audios (no .svg check due to massive .svg files in ttkf projects!)
                 if file.endswith('.png') or file.endswith('.jpg') or file.endswith('.gif') or file.endswith('.jpeg') or file.endswith('.bmp') or file.endswith('.tiff') or file.endswith('.tif') or file.endswith('.avif') or file.endswith('.webp') or file.endswith('pdf'):
-                    print(os.path.join(folder, file).replace('\\', '/'))
-                    report.append(check_file(os.path.join(folder, file).replace('\\', '/')))
-                    file_paths.append(os.path.join(folder, file))
+                    print(os.path.join(folder, file).replace('/', '\\'))
+                    report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
+                    file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                 elif file.endswith('.mpeg') or file.endswith('.mp4') or file.endswith('.mov') or file.endswith('.ogg') or file.endswith('.avi') or file.endswith('.wmv') or file.endswith('.mkv') or file.endswith('.flv'):
-                    print(os.path.join(folder, file).replace('\\', '/'))
-                    file_paths.append(os.path.join(folder, file).replace('\\', '/'))
-                    report.append(check_file(os.path.join(folder, file)))
+                    print(os.path.join(folder, file).replace('/', '\\'))
+                    file_paths.append(os.path.join(folder, file).replace('/', '\\'))
+                    report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
                 elif file.endswith('.mp3') or file.endswith('.ogv') or file.endswith('.aac') or file.endswith('.wav') or file.endswith('.mpg') or file.endswith('.mpeg') or file.endswith('.m2v'):
-                    print(os.path.join(folder, file).replace('\\', '/'))
-                    file_paths.append(os.path.join(folder, file).replace('\\', '/'))
-                    report.append(check_file(os.path.join(folder, file)))
+                    print(os.path.join(folder, file).replace('/', '\\'))
+                    file_paths.append(os.path.join(folder, file).replace('/', '\\'))
+                    report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
     # create report for each unzipped SCORM package
     report_filtered = filter_report(report, file_paths)
     restore_cwd = os.getcwd()
