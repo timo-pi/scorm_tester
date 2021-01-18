@@ -124,7 +124,7 @@ def checkMediaFiles(directories):
                     print(os.path.join(folder, file).replace('/', '\\'))
                     report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
-                elif file.endswith('.mpeg') or file.endswith('.mp4') or file.endswith('.mov') or file.endswith('.ogg') or file.endswith('.avi') or file.endswith('.wmv') or file.endswith('.mkv') or file.endswith('.flv'):
+                elif file.endswith('.mpeg') or file.endswith('.mp4') or file.endswith('.mov') or file.endswith('.ogg') or file.endswith('.avi') or file.endswith('.wmv') or file.endswith('.mkv') or file.endswith('.flv') or file.endswith('.swf'):
                     print(os.path.join(folder, file).replace('/', '\\'))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                     report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
