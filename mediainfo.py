@@ -72,11 +72,19 @@ def filter_report(report, file_paths):
             file_counter += 1
         except:
             print("Warning: No more file paths to grab!")
-
-        if "MiB" in data_dict.get('File Size'):
-            row.append(float(data_dict.get('File Size').replace(' MiB', '').replace('.', ''))*1000)
-        else:
-            row.append(float(data_dict.get('File Size').replace(' KiB', '')))
+        try:
+            if "MiB" in data_dict.get('File Size'):
+                row.append(float(data_dict.get('File Size').replace(' MiB', '').replace('.', ''))*1000)
+            elif "KiB" in data_dict.get('File Size'):
+                row.append(float(data_dict.get('File Size').replace(' KiB', '')))
+            elif "bytes" in data_dict.get('File Size'):
+                row.append(float(data_dict.get('File Size').replace(' bytes', '')/1000))
+            else:
+                row.append(float(data_dict.get('File Size')))
+        except:
+            row.append(data_dict.get('File Size')) if 'File Size' in data_dict else row.append("")
+            print("Conversion of file size to float not possible:")
+            print(data_dict.get('File Size')) if 'File Size' in data_dict else print("No File Size data present!")
         #row.append(float(data_dict.get('File Size').replace(' KiB', '').replace(' MiB', ''))) if 'File Size' in data_dict else row.append("")
         row.append(data_dict.get('File Type')) if 'File Type' in data_dict else row.append("")
         row.append(data_dict.get('MIME Type')) if 'MIME Type' in data_dict else row.append(" ")
@@ -112,15 +120,20 @@ def unzipScormFiles(scorm_path):
                 unzipped_directories.append(new_directory)
 
 # find all images and videos of unzipped content
-def checkMediaFiles(directories):
+def checkMediaFiles(directories, svg):
     for unzip_dir in directories:
         report = []
         # list of all media file paths (to put into report)
         file_paths = []
         for folder, subfolders, filenames in os.walk(unzip_dir):
             for file in filenames:
-                # search for images, videos, audios (no .svg check due to massive .svg files in ttkf projects!)
-                if file.endswith('.png') or file.endswith('.jpg') or file.endswith('.gif') or file.endswith('.jpeg') or file.endswith('.bmp') or file.endswith('.tiff') or file.endswith('.tif') or file.endswith('.avif') or file.endswith('.webp') or file.endswith('pdf'):
+                # search for images, videos, audios (checkbox svg due to massive .svg files in ttkf projects!)
+                if svg:
+                    if file.endswith('.svg'):
+                        print(os.path.join(folder, file).replace('/', '\\'))
+                        report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
+                        file_paths.append(os.path.join(folder, file).replace('/', '\\'))
+                elif file.endswith('.png') or file.endswith('.jpg') or file.endswith('.gif') or file.endswith('.jpeg') or file.endswith('.bmp') or file.endswith('.tiff') or file.endswith('.tif') or file.endswith('.avif') or file.endswith('.webp') or file.endswith('pdf'):
                     print(os.path.join(folder, file).replace('/', '\\'))
                     report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
