@@ -13,7 +13,6 @@ exif = './exiftool.exe'
 
 # Methods
 def check_file(file_input):
-    print("Analyzing media file...")
     print("FILE_INPUT: " + str(file_input))
     metadata = []
     process = subprocess.Popen([exif, file_input], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8', errors='ignore')

@@ -3,6 +3,7 @@ import os
 import subprocess
 import zipfile
 from pathlib import Path
+from PIL import Image
 
 # Variables
 path = 'c:\\temp\\scorm\\'
@@ -13,7 +14,6 @@ exif = './exiftool.exe'
 
 # Methods
 def check_file(file_input):
-    print("Analyzing media file...")
     print("FILE_INPUT: " + str(file_input))
     metadata = []
     process = subprocess.Popen([exif, file_input], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True, encoding='utf8', errors='ignore')
@@ -23,7 +23,27 @@ def check_file(file_input):
         info.append(line[0].strip())
         info.append(line[1].strip())
         metadata.append(info)
+        print("METADATA: " + str(metadata))
     return metadata
+
+def check_image(file):
+    values = []
+    # get image size
+    size = int(os.path.getsize(file))
+    size /= 1000
+
+    # get image dimensions
+    img = Image.open(file)
+    width, height = img.size
+    if file[-3:] == 'peg':
+        values.append(['File Type', 'JPEG'])
+    else:
+        values.append(['File Type', file[-3:].upper()])
+    values.append(['File Size', str(size)])
+    values.append(['Image Width', str(width)])
+    values.append(['Image Height', str(height)])
+    print(str(values))
+    return values
 
 def changeExcelColumnWidth(ws):
     cell = ['A','B','C','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T']
@@ -135,11 +155,14 @@ def checkMediaFiles(directories, svg_exclude):
                     print(os.path.join(folder, file).replace('/', '\\'))
                     report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
-                elif file.endswith('.png') or file.endswith('.jpg') or file.endswith('.gif') or file.endswith('.jpeg') or file.endswith('.bmp') or file.endswith('.tiff') or file.endswith('.tif') or file.endswith('.avif') or file.endswith('.webp') or file.endswith('pdf'):
+                elif file.endswith('.png') or file.endswith('.jpg') or file.endswith('.gif') or file.endswith('.jpeg') or file.endswith('.bmp') or file.endswith('.tiff') or file.endswith('.tif') or file.endswith('.avif') or file.endswith('.webp'):
                     print(os.path.join(folder, file).replace('/', '\\'))
-                    report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
+
+                    # report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
+
+                    report.append(check_image(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
-                elif file.endswith('.mpeg') or file.endswith('.mp4') or file.endswith('.mov') or file.endswith('.ogg') or file.endswith('.avi') or file.endswith('.wmv') or file.endswith('.mkv') or file.endswith('.flv') or file.endswith('.swf'):
+                elif file.endswith('.mpeg') or file.endswith('.mp4') or file.endswith('.mov') or file.endswith('.ogg') or file.endswith('.avi') or file.endswith('.wmv') or file.endswith('.mkv') or file.endswith('.flv') or file.endswith('.swf') or file.endswith('pdf'):
                     print(os.path.join(folder, file).replace('/', '\\'))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                     report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
