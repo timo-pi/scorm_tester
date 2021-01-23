@@ -14,7 +14,7 @@ import mediainfo
 # pyinstaller --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "exiftool.exe;." --icon=schwarz.ico --clean -y scormTester.py
 #*****************************************************
 
-version = "v2.1 | 19.01.2021"
+version = "v2.2 | 23.01.2021"
 
 multi_files_select = False
 report_path = ""
@@ -188,7 +188,7 @@ def selectFiles():
         print("FILE: " + str(root.filenames))
         media_path = runChecks(sz.extractScorm(root.filenames[0]))
         if checkbox_media_test.get():
-            mediainfo.checkMediaFiles([media_path], checkbox_svg.get())
+            mediainfo.checkMediaFiles([media_path], checkbox_svg)
         else:
             print("Media files check disabled.")
 
@@ -271,8 +271,8 @@ checkbox_media_test.set(True)
 Checkbutton(root, text="Create Media Files Report", command=toggleMediaCheck, variable=checkbox_media_test).place(x=180, y=215)
 
 checkbox_svg = IntVar()
-checkbox_svg.set(False)
-Checkbutton(root, text="Include svg files", command=toggleSvgCheck, variable=checkbox_svg).place(x=180, y=240)
+checkbox_svg.set(True)
+Checkbutton(root, text="exclude ttkf player directory", command=toggleSvgCheck, variable=checkbox_svg).place(x=180, y=240)
 
 # Labels
 label_group = tk.Label(root, borderwidth=2, relief="groove")
