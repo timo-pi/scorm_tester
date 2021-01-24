@@ -14,7 +14,7 @@ import mediainfo
 # pyinstaller --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "exiftool.exe;." --icon=schwarz.ico --clean -y scormTester.py
 #*****************************************************
 
-version = "v2.2 | 23.01.2021"
+version = "v2.3 | 24.01.2021"
 
 multi_files_select = False
 report_path = ""

@@ -30,7 +30,7 @@ def retrieve_file_paths(dirName):
     zip_file.close()"""
 
 def zipDir(dir_name, out_filename):
-    print("def zipDir2: ")
+    print("Creating new SCORM package in directory " + str(Path(dir_name).parent.parent) + "...")
     print(Path(dir_name).parent.parent)
     current_cwd = os.getcwd()
     os.chdir(Path(dir_name).parent.parent)
