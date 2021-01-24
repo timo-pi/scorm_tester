@@ -152,22 +152,18 @@ def checkMediaFiles(directories, svg_exclude):
             for file in filenames:
                 # search for images, videos, audios (checkbox svg due to massive .svg files in ttkf projects!)
                 if file.endswith('.svg'):
-                    print(os.path.join(folder, file).replace('/', '\\'))
+                    #print(os.path.join(folder, file).replace('/', '\\'))
                     report.append(checkImage(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                 elif file.endswith('.png') or file.endswith('.jpg') or file.endswith('.gif') or file.endswith('.jpeg') or file.endswith('.bmp') or file.endswith('.tiff') or file.endswith('.tif') or file.endswith('.avif') or file.endswith('.webp'):
-                    print(os.path.join(folder, file).replace('/', '\\'))
-
-                    # report.append(check_file(os.path.join(folder, file).replace('/', '\\')))
-
                     report.append(checkImage(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                 elif file.endswith('.mpeg') or file.endswith('.mp4') or file.endswith('.mov') or file.endswith('.ogg') or file.endswith('.avi') or file.endswith('.wmv') or file.endswith('.mkv') or file.endswith('.flv') or file.endswith('.swf') or file.endswith('pdf'):
-                    print(os.path.join(folder, file).replace('/', '\\'))
+                    #print(os.path.join(folder, file).replace('/', '\\'))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                     report.append(checkAudioVideo(os.path.join(folder, file).replace('/', '\\')))
                 elif file.endswith('.mp3') or file.endswith('.ogv') or file.endswith('.aac') or file.endswith('.wav') or file.endswith('.mpg') or file.endswith('.mpeg') or file.endswith('.m2v'):
-                    print(os.path.join(folder, file).replace('/', '\\'))
+                    #print(os.path.join(folder, file).replace('/', '\\'))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                     report.append(checkAudioVideo(os.path.join(folder, file).replace('/', '\\')))
     # create report for each unzipped SCORM package
@@ -176,8 +172,3 @@ def checkMediaFiles(directories, svg_exclude):
     os.chdir(unzip_dir)
     write_to_excel(report_filtered, unzip_dir)
     os.chdir(restore_cwd)
-    #print(report)
-
-# FOR TESTING PURPOSES ONLY:
-#unzipScormFiles(path)
-#checkMediaFiles(['C:\\Users\\timop\\Downloads\\ZIP-Tests\\temp\\course-scorm2004_4'])

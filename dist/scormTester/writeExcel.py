@@ -9,10 +9,9 @@ def createReport(path):
     ws.column_dimensions['C'].width = 35
     ws.column_dimensions['D'].width = 55
     ws.column_dimensions['E'].width = 40
-    ws.column_dimensions['F'].width = 65
 
     # Rows can also be appended
-    ws.append(["COURSE FILE PATH", "SCORM VERSION", "ONE ITEM CHECK", "ADLNAV NAMESPACE (2004 4th only)", "SPECIAL CHARACTERS CHECK", "OVERALL STATUS"])
+    ws.append(["COURSE FILE PATH", "SCORM VERSION", "ONE ITEM CHECK", "ADLNAV NAMESPACE (2004 4th only)", "SPECIAL CHARACTERS CHECK"])
     try:
         wb.save(os.path.join(path, "SCORM-Test-Report.xlsx"))
         wb.close()

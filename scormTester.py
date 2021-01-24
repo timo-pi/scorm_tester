@@ -20,7 +20,8 @@ multi_files_select = False
 report_path = ""
 report_saved = False
 check_media_files = True
-global checkbox_svg
+ns_problem_found = False
+#global checkbox_svg, label_characters, SCORM_2004_4, ns_problem_found, label_scorm, label_namespace, label_item
 
 def saveImsmanifest(rootnode, path):
     with open(path, 'w') as f:
@@ -30,10 +31,10 @@ def saveImsmanifest(rootnode, path):
     ##sz.zipScorm(path)
 
 def runChecks(path):
+    SCORM_2004_4 = False
     path = path.replace('\\', '/')
     report_data = [path]
     print("PATH: " + str(path))
-    SCORM_2004_4 = False
     # open xml document
     try:
         domtree = minidom.parse(path + "/imsmanifest.xml")
@@ -105,7 +106,6 @@ def runChecks(path):
 
     ### check for adlnav namespace in manifest
     if SCORM_2004_4:
-        global ns_problem_found
         ns_problem_found = False
         test = rootnode.getAttribute("xmlns:adlnav")
         # add adlnav attribute to manifest
@@ -130,17 +130,12 @@ def runChecks(path):
 
         # zip scorm package
         if ns_problem_found:
-            ##file_paths = sz.retrieve_file_paths(path)
-
-            #file_name = os.path.basename(os.path.dirname(path + "/imsmanifest.xml")) + '_SF.zip'
             parent_path = Path(path).parent
-            zip_path = os.path.join(parent_path.parent, os.path.basename(os.path.dirname(path + "/imsmanifest.xml"))) + '_SF.zip'
-            #new_zip_file_path = os.path.join(os.path.dirname(path), file_name)
+            os.path.join(parent_path.parent, os.path.basename(os.path.dirname(path + "/imsmanifest.xml"))) + '_sf.zip'
             setLabelStatus("imsmanifest.xml adjusted and new SCORM package created!", '#ffd275')
 
             # save manifest.xml
             saveImsmanifest(rootnode, path + "/imsmanifest.xml")
-            ##sz.zipScorm(file_paths, zip_path)
             sz.zipDir(path, os.path.basename(path) + '_sf')
 
             setNamespaceLabel("New imsmanifest.xml has been created!", '#ffd275')
@@ -154,7 +149,9 @@ def runChecks(path):
         if multi_files_select: report_data.append("Passed: Namespace not relevant for this SCORM version.")
 
     # check filenames for special characters
-    if xhelp.checkSpecialCharsInFileNames(rootnode, (os.path.dirname(path + "/imsmanifest.xml") + '_SPECIAL_CHARACTERS.xlsx')):
+    parent_path = str(Path(path).parent.parent)
+    report_name = "\\SPECIAL_CHARACTERS_" + str(os.path.basename(path)) + ".xlsx"
+    if xhelp.checkSpecialCharsInFileNames(rootnode, (parent_path + report_name)):
         label_characters = tk.Label(root, textvariable=text_characters, anchor="w", background='#c7d66d') #green
         label_characters.place(x=20, y=110, width=460, height=30)
         text_characters.set("Passed: No special characters in file or title elements.")
@@ -170,7 +167,6 @@ def runChecks(path):
 
     # save Report if multiple files selected
     if multi_files_select:
-        report_data.append(os.path.dirname(path + "/imsmanifest.xml") + '_SF.zip')
         global report_saved
         report_saved = we.writeReport(report_path, report_data)
         if report_saved:
