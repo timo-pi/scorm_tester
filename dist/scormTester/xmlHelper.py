@@ -5,19 +5,18 @@ from pathlib import Path
 
 class xmlHelper:
 
-    # Check for special characters (not safe - do not use)
-    def checkSpecialCharsGlobal(url):
-        xml_string = open(url)
-        print("1. Valid! - no special characters found" if re.match("""^[a-zA-Z0-9_=.":/<>?_\-\s]*$""", xml_string.read()) else "1. Invalid!!! - special characters found!")
-
     # Check if only one Item present
     def checkOneItemOnly(rootnode):
         return True if len(rootnode.getElementsByTagName('item')) == 1 else False
 
     # check filenames for special characters
     def checkSpecialCharsInFileNames(rootnode, path):
-        parent_path = Path(path).parent
-        report_path = os.path.join(parent_path.parent, os.path.basename(os.path.dirname(path + "/imsmanifest.xml")))
+
+        #print(path)
+        #parent_path = Path(path).parent
+        #report_path = os.path.join(parent_path.parent, os.path.basename(os.path.dirname(path + "/imsmanifest.xml")))
+        print(path)
+        print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
 
         file_strings = rootnode.getElementsByTagName('file')
         title_strings = rootnode.getElementsByTagName('title')
@@ -65,7 +64,7 @@ class xmlHelper:
                 print("Exception during special characters Check.")
 
         if len(report_data) > 0:
-            we.createItemsReport(report_path, report_data)
+            we.createItemsReport(path, report_data)
 
         return isValid
 

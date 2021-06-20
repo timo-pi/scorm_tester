@@ -4,11 +4,11 @@ import os
 def createReport(path):
     wb = Workbook()
     ws = wb.active
-    ws.column_dimensions['A'].width = 65
-    ws.column_dimensions['B'].width = 20
-    ws.column_dimensions['C'].width = 35
-    ws.column_dimensions['D'].width = 55
-    ws.column_dimensions['E'].width = 40
+    ws.column_dimensions['A'].width = 72
+    ws.column_dimensions['B'].width = 22
+    ws.column_dimensions['C'].width = 36
+    ws.column_dimensions['D'].width = 62
+    ws.column_dimensions['E'].width = 44
 
     # Rows can also be appended
     ws.append(["COURSE FILE PATH", "SCORM VERSION", "ONE ITEM CHECK", "ADLNAV NAMESPACE (2004 4th only)", "SPECIAL CHARACTERS CHECK"])
