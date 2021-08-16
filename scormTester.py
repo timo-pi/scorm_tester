@@ -9,7 +9,7 @@ from pathlib import Path
 import mediainfo
 from concurrent.futures import ThreadPoolExecutor
 
-#**************************************************+++
+#**************************************************+++ PERFORMANCE
 # Command to build exe:
 # pyinstaller --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --onefile --clean -y scormTester.py
 # pyinstaller --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "exiftool.exe;." --icon=schwarz.ico --clean -y scormTester.py
