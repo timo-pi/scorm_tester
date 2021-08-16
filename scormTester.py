@@ -7,6 +7,7 @@ import scormZipper as sz
 import writeExcel as we
 from pathlib import Path
 import mediainfo
+from concurrent.futures import ThreadPoolExecutor
 
 #**************************************************+++
 # Command to build exe:
