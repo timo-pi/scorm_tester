@@ -1,7 +1,9 @@
 import os, re
 import xlsxwriter
 import writeExcel as we
-from pathlib import Path
+import shutil
+import gui
+from xml.dom import minidom
 
 class xmlHelper:
 
@@ -21,6 +23,7 @@ class xmlHelper:
         file_strings = rootnode.getElementsByTagName('file')
         title_strings = rootnode.getElementsByTagName('title')
         item_strings = rootnode.getElementsByTagName('item')
+
 
         report_data = []
         isValid = True
@@ -65,6 +68,8 @@ class xmlHelper:
 
         if len(report_data) > 0:
             we.createItemsReport(path, report_data)
+        else:
+            we.createItemsReport(path, ['nothing found!'])
 
         return isValid
 
@@ -111,12 +116,89 @@ class xmlHelper:
         parent.insertBefore(title_element, adlnav)
 
         # title_element.parentNode.insertBefore(adln_presentation, title_element)
+
         return domtree
+
+    # check TTKF Mode (Training or Assessment)
+    def checkAssessment(domtree, path):
+        global assessment_mode
+        global gui_message
+        assessment_mode = False
+        try:
+            titles = domtree.getElementsByTagName('title')
+            for title in titles:
+                if 'Assessment' in title.firstChild.data and not assessment_mode:
+                    assessment_mode = True
+                    #find TTKF Version
+                    global runjs_source
+                    global runjs_version
+                    try:
+                        meta_inf = minidom.parse(os.path.join(path, 'meta-inf.xml')).documentElement.getElementsByTagName('Metadata')
+                        for i in meta_inf:
+                            product_version = i.getAttribute('ProductVersion')
+                            if product_version[0:2] == '20':
+                                runjs_version = '20'
+                                runjs_source = os.path.join(os.getcwd(), 'run_20.js')
+                            elif product_version[0:2] == '21':
+                                runjs_version = '21'
+                                runjs_source = os.path.join(os.getcwd(), 'run_21.js')
+                            else:
+                                runjs_version = 'unknown'
+                    except:
+                        print('error parsing meta-inf.xml')
+                    try:
+                        print('TTKF ASSESSMENT mode detected, copying run.js version ' + runjs_version)
+                        runjs_destination = os.path.join(path, 'com.tts.player', 'src', 'run.js')
+                        shutil.copyfile(runjs_source, runjs_destination)
+                        message = 'TTKF Assessment - run.js v.' + runjs_version + ' replaced'
+                        gui_message = [message, '#ffff00']
+                    except:
+                        print('error copying run.js version ' + runjs_version)
+                        gui_message = ['TTKF Assessment - ERROR - run.js was NOT copied', '#ff0000']
+                else:
+                    gui_message = ['No TTKF Assessment', '#00ff00']
+            return gui_message
+        except:
+            gui_message = ['Error checking TTKF assessment mode']
+            print("Error checking TTKF assessment mode")
+            return gui_message
 
     # check scorm version
     def checkScormVersion(rootnode):
         schema_node = rootnode.getElementsByTagName('schemaversion')[0].firstChild.data
         return schema_node
+
+
+    def writeInfoToReport(rootnode):
+        print("****** new report elements ******")
+        add_data = []
+
+        #print(rootnode.getAttribute('identifier'))
+        add_data.append(str(rootnode.getAttribute('identifier')))
+
+        #print(rootnode.getElementsByTagName('organizations')[0].getAttribute('default'))
+        add_data.append(str(rootnode.getElementsByTagName('organizations')[0].getAttribute('default')))
+
+        #print(rootnode.getElementsByTagName('organization')[0].getAttribute('identifier'))
+        add_data.append(str(rootnode.getElementsByTagName('organization')[0].getAttribute('identifier')))
+
+        metadata = rootnode.getElementsByTagName('metadata')
+        #print(metadata[0].getElementsByTagName('imsmd:title')[0].toxml())
+        add_data.append(str(metadata[0].getElementsByTagName('imsmd:title')[0].toxml()))
+
+        for node in rootnode.getElementsByTagName('identifier'):
+            #print('identifier=' + node.toxml())
+            add_data.append(str())
+        for node in rootnode.getElementsByTagName('identifierref'):
+            #print('identifierref=' + node.toxml())
+            add_data.append(str('identifier=' + node.toxml()))
+
+        for node in rootnode.getElementsByTagName('title'):
+            #print(node.toxml())
+            add_data.append(str(node.toxml()))
+        #print(rootnode.getElementsByTagName('resource')[0].getAttribute('identifier'))
+        add_data.append(str(rootnode.getElementsByTagName('resource')[0].getAttribute('identifier')))
+        return add_data
 
     def createExcelReport(path, data):
         workbook = xlsxwriter.Workbook('hello.xlsx')
@@ -125,3 +207,35 @@ class xmlHelper:
         worksheet.write('A1', 'Hello world')
 
         workbook.close()
+
+
+    def writeInfoToReport(rootnode):
+        print("****** new report elements ******")
+        add_data = []
+
+        # print(rootnode.getAttribute('identifier'))
+        add_data.append(str(rootnode.getAttribute('identifier')))
+
+        # print(rootnode.getElementsByTagName('organizations')[0].getAttribute('default'))
+        add_data.append(str(rootnode.getElementsByTagName('organizations')[0].getAttribute('default')))
+
+        # print(rootnode.getElementsByTagName('organization')[0].getAttribute('identifier'))
+        add_data.append(str(rootnode.getElementsByTagName('organization')[0].getAttribute('identifier')))
+
+        metadata = rootnode.getElementsByTagName('metadata')
+        # print(metadata[0].getElementsByTagName('imsmd:title')[0].toxml())
+        add_data.append(str(metadata[0].getElementsByTagName('imsmd:title')[0].toxml()))
+
+        for node in rootnode.getElementsByTagName('identifier'):
+            # print('identifier=' + node.toxml())
+            add_data.append(str())
+        for node in rootnode.getElementsByTagName('identifierref'):
+            # print('identifierref=' + node.toxml())
+            add_data.append(str('identifier=' + node.toxml()))
+
+        for node in rootnode.getElementsByTagName('title'):
+            # print(node.toxml())
+            add_data.append(str(node.toxml()))
+        # print(rootnode.getElementsByTagName('resource')[0].getAttribute('identifier'))
+        add_data.append(str(rootnode.getElementsByTagName('resource')[0].getAttribute('identifier')))
+        return add_data
