@@ -6,6 +6,7 @@ import scormZipper as sz
 import writeExcel as we
 from pathlib import Path
 import mediainfo
+import lms_upload as lms
 import gui
 
 #*****************************************************
@@ -203,6 +204,11 @@ def selectFiles():
             mediainfo.checkMediaFiles([media_path], gui.checkbox_svg.get())
         else:
             print("Media files check disabled.")
+
+        # LMS-Upload
+        if gui.checkbox_lms.get():
+            lms.start_upload(media_path)
+
 
     # MULTIPLE FILES SELECTED
     elif len(gui.root.filenames) > 1:
