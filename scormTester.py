@@ -12,8 +12,8 @@ import disable_time_score as dts
 
 #*****************************************************
 # Command to build exe:
-# pyinstaller --noconfirm --onefile --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --icon=schwarz.ico --clean scormTester.py
-# pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --icon=schwarz.ico --clean scormTester.py
+# pyinstaller --noconfirm --onefile --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --icon=schwarz.ico --clean scormTester.py
+# pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --icon=schwarz.ico --clean scormTester.py
 #*****************************************************
 
 version = "v2.6 | 17.07.2022"
@@ -58,13 +58,20 @@ def runChecks(path):
     # disable learning time + score for ttkf, Storyline, Rise content
     if gui.checkbox_disable_time_score.get():
         result = dts.disable_time_score(path)
-        if result != "-":
+        print("RESULT:")
+        print(result)
+        if result == "scormdriver.js has been modified" or result == "run.js has been modified":
             new_scorm_zip = True
+            gui.setLabelTimeScore(result, '#00ff00')
+        else:
+            gui.setLabelTimeScore(result, '#ff6d0a')
         report_data.append(result)
+
 
     # check SCORM version and assessment-mode
     if gui.checkbox_runjs.get():
         ttkf_assessment = xhelp.checkAssessment(rootnode, path)
+        # runjs_time_score_message = str(runjs_time_score_message + " | " + ttkf_assessment[0])
         gui.setLabelTtkf(ttkf_assessment[0], ttkf_assessment[1])
 
         if ttkf_assessment[0] != 'No TTKF Assessment':
@@ -237,5 +244,5 @@ def selectFiles():
 print("Scorm-Tester " + version)
 
 btn_select = gui.tk.Button(gui.root, text="Select File(s)", command=selectFiles, bg='grey')
-btn_select.place(x=180, y=280, width=140, height=30)
+btn_select.place(x=180, y=350, width=140, height=30)
 gui.root.mainloop()

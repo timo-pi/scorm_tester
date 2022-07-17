@@ -25,10 +25,10 @@ def change_articulate_scormdriver(path):
 
         with open(path, 'w') as f:
             f.writelines(new_script)
-        return "Scormdriver.js has been modified!"
+        return "scormdriver.js has been modified"
     except:
-        print("Error scormdriver.js")
-        return "Error modifying scormdriver.js, nothing changed!"
+        print("Error modifying scormdriver.js!")
+        return "Error modifying scormdriver.js!"
 
 def change_runjs(path):
     try:
@@ -36,29 +36,32 @@ def change_runjs(path):
             runjs_lines = f.readlines()
             for line in runjs_lines:
                 line = re.sub(r',(.\(.\.SESSION_TIME,.\),)(.\(.\.EXIT)', r',/*\1*/\2', line)
-                print(line)
                 new_script.append(line)
 
         with open(path, 'w') as f:
             f.writelines(new_script)
-        return "run.js has been modified!"
+        print("run.js has been modified")
+        return "run.js has been modified"
     except:
-        print("Error changing run.js")
-        return "Error modifying run.js, nothing changed!"
+        print("Error modifying run.js!")
+        return "Error modifying run.js!"
 
 def disable_time_score(path):
     if os.path.isfile(os.path.join(path, r'scormdriver\scormdriver.js')):
         print("Articulate Rise Content detected!")
         rise_path = os.path.join(path, r'scormdriver/scormdriver.js')
-        change_articulate_scormdriver(rise_path)
+        result = change_articulate_scormdriver(rise_path)
+        return result
     elif os.path.isfile(os.path.join(path, r'lms\scormdriver.js')):
         print("Articulate Storyline Content detected!")
         storyline_path = os.path.join(path, r'lms\scormdriver.js')
-        change_articulate_scormdriver(storyline_path)
+        result = change_articulate_scormdriver(storyline_path)
+        return result
     elif os.path.isfile(os.path.join(path, r'com.tts.player\src\run.js')):
         print("TTKF Content detected!")
         ttkf_path = os.path.join(path, r'com.tts.player\src\run.js')
-        change_runjs(ttkf_path, r'com.tts.player\src\run.js')
+        result = change_runjs(ttkf_path)
+        return result
     else:
         print("No Articulate or TTKF Content found!")
         return "-"
