@@ -25,10 +25,10 @@ def change_articulate_scormdriver(path):
 
         with open(path, 'w') as f:
             f.writelines(new_script)
-        return "scormdriver.js has been modified"
+        return "Scormdriver has been modified!"
     except:
-        print("Error modifying scormdriver.js!")
-        return "Error modifying scormdriver.js!"
+        print("Error modifying Scormdriver!")
+        return "Error modifying Scormdriver"
 
 def change_runjs(path):
     try:
@@ -36,6 +36,8 @@ def change_runjs(path):
             runjs_lines = f.readlines()
             for line in runjs_lines:
                 line = re.sub(r',(.\(.\.SESSION_TIME,.\),)(.\(.\.EXIT)', r',/*\1*/\2', line)
+                line = re.sub(r',.\.setValue\(.\.SCORE_SCALED[^1]*100\)', r' ', line)
+                line = re.sub(r',.\.setValue\(.\.SCORE_RAW.*?SCORE_MAX\)\)', r' ', line)
                 new_script.append(line)
 
         with open(path, 'w') as f:
@@ -62,7 +64,13 @@ def disable_time_score(path):
         ttkf_path = os.path.join(path, r'com.tts.player\src\run.js')
         result = change_runjs(ttkf_path)
         return result
+    elif os.path.isfile(os.path.join(path, r'lms\SCORM2004Functions.js')):
+        print("Articulate Storyline Content detected!")
+        os.path.join(path, r'lms\SCORM2004Functions.js')
+        storyline_path = os.path.join(path, r'lms\SCORMFunctions.js')
+        result = change_articulate_scormdriver(storyline_path)
+        return result
     else:
         print("No Articulate or TTKF Content found!")
-        return "-"
+        return "No Articulate or TTKF Content!"
 

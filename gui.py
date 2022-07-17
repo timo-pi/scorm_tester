@@ -89,11 +89,11 @@ tk.Checkbutton(root, text="Replace run.js (if TTKF Assessment)", variable=checkb
 
 checkbox_svg = IntVar()
 checkbox_svg.set(True)
-tk.Checkbutton(root, text="exclude ttkf player directory", command=toggleSvgCheck, variable=checkbox_svg, bg='grey').place(x=40, y=300)
+tk.Checkbutton(root, text="Exclude ttkf player directory", command=toggleSvgCheck, variable=checkbox_svg, bg='grey').place(x=40, y=300)
 
 checkbox_disable_time_score = IntVar()
 checkbox_disable_time_score.set(False)
-tk.Checkbutton(root, text="disable time+score (TTKF, Storyline, Rise)", variable=checkbox_disable_time_score, bg='grey').place(x=250, y=300)
+tk.Checkbutton(root, text="Disable time+score (TTKF, Storyline, Rise)", variable=checkbox_disable_time_score, bg='grey').place(x=250, y=300)
 
 # Labels
 label_group = tk.Label(root, borderwidth=2, relief="groove", bg='grey')

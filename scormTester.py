@@ -60,11 +60,11 @@ def runChecks(path):
         result = dts.disable_time_score(path)
         print("RESULT:")
         print(result)
-        if result == "scormdriver.js has been modified" or result == "run.js has been modified":
+        if result == "Scormdriver has been modified!" or result == "run.js has been modified":
             new_scorm_zip = True
             gui.setLabelTimeScore(result, '#00ff00')
         else:
-            gui.setLabelTimeScore(result, '#ff6d0a')
+            gui.setLabelTimeScore(result, '#ffff00')
         report_data.append(result)
 
 
