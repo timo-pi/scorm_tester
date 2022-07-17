@@ -6,8 +6,9 @@ import scormZipper as sz
 import writeExcel as we
 from pathlib import Path
 import mediainfo
-import lms_upload as lms
+# import lms_upload as lms
 import gui
+import disable_time_score as dts
 
 #*****************************************************
 # Command to build exe:
@@ -15,7 +16,7 @@ import gui
 # pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --icon=schwarz.ico --clean scormTester.py
 #*****************************************************
 
-version = "v2.5 | 23.05.2022"
+version = "v2.6 | 17.07.2022"
 
 multi_files_select = False
 report_path = ""
@@ -52,8 +53,16 @@ def runChecks(path):
         gui.text_namespace.set("Please check your SCORM-File manually.")
         return 0
 
-    # check SCORM version and assessment-mode
     gui.clearLabels()
+
+    # disable learning time + score for ttkf, Storyline, Rise content
+    if gui.checkbox_disable_time_score.get():
+        result = dts.disable_time_score(path)
+        if result != "-":
+            new_scorm_zip = True
+        report_data.append(result)
+
+    # check SCORM version and assessment-mode
     if gui.checkbox_runjs.get():
         ttkf_assessment = xhelp.checkAssessment(rootnode, path)
         gui.setLabelTtkf(ttkf_assessment[0], ttkf_assessment[1])
@@ -206,8 +215,8 @@ def selectFiles():
             print("Media files check disabled.")
 
         # LMS-Upload
-        if gui.checkbox_lms.get():
-            lms.start_upload(media_path)
+        # if gui.checkbox_lms.get():
+        #     lms.start_upload(media_path)
 
 
     # MULTIPLE FILES SELECTED

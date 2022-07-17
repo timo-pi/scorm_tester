@@ -83,9 +83,9 @@ checkbox_svg = IntVar()
 checkbox_svg.set(True)
 tk.Checkbutton(root, text="exclude ttkf player directory", command=toggleSvgCheck, variable=checkbox_svg, bg='grey').place(x=40, y=240)
 
-checkbox_lms = IntVar()
-checkbox_lms.set(False)
-tk.Checkbutton(root, text="LMS-Upload (beta)", variable=checkbox_lms, bg='grey').place(x=250, y=240)
+checkbox_disable_time_score = IntVar()
+checkbox_disable_time_score.set(False)
+tk.Checkbutton(root, text="disable time+score (TTKF, Storyline, Rise)", variable=checkbox_disable_time_score, bg='grey').place(x=250, y=240)
 
 # Labels
 label_group = tk.Label(root, borderwidth=2, relief="groove", bg='grey')
