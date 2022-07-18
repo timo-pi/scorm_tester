@@ -21,7 +21,6 @@ version = "v2.6 | 17.07.2022"
 multi_files_select = False
 report_path = ""
 report_saved = False
-global new_scorm_zip
 new_scorm_zip = False
 #global checkbox_svg, label_characters, SCORM_2004_4, new_scorm_zip, label_scorm, label_namespace, label_item
 
@@ -55,19 +54,6 @@ def runChecks(path):
 
     gui.clearLabels()
 
-    # disable learning time + score for ttkf, Storyline, Rise content
-    if gui.checkbox_disable_time_score.get():
-        result = dts.disable_time_score(path)
-        print("RESULT:")
-        print(result)
-        if result == "Scormdriver has been modified!" or result == "run.js has been modified":
-            new_scorm_zip = True
-            gui.setLabelTimeScore(result, '#00ff00')
-        else:
-            gui.setLabelTimeScore(result, '#ffff00')
-        report_data.append(result)
-
-
     # check SCORM version and assessment-mode
     if gui.checkbox_runjs.get():
         ttkf_assessment = xhelp.checkAssessment(rootnode, path)
@@ -81,6 +67,18 @@ def runChecks(path):
             report_data.append(ttkf_assessment[0])
     else:
         report_data.append('Assessment-Check off')
+
+    # disable learning time + score for ttkf, Storyline, Rise content
+    if gui.checkbox_disable_time_score.get():
+        result = dts.disable_time_score(path)
+        print("RESULT:")
+        print(result)
+        if result == "Scormdriver has been modified!" or result == "run.js has been modified":
+            new_scorm_zip = True
+            gui.setLabelTimeScore(result, '#00ff00')
+        else:
+            gui.setLabelTimeScore(result, '#ffff00')
+        report_data.append(result)
 
     scorm_version = xhelp.checkScormVersion(domtree)
     gui.setLabelStatus("Overall Status: OK.", '#00ff00')
@@ -160,26 +158,22 @@ def runChecks(path):
             else:
                 report_data.append("Passed: Namespace present or not relevant for this SCORM version")
 
-        # zip scorm package
-        if new_scorm_zip:
-            parent_path = Path(path).parent
-            os.path.join(parent_path.parent, os.path.basename(os.path.dirname(path + "/imsmanifest.xml"))) + '_sf.zip'
-            gui.setLabelStatus("New SCORM package created!", '#ffff00')
-
-            # save manifest.xml
-            saveImsmanifest(rootnode, path + "/imsmanifest.xml")
-            sz.zipDir(path, os.path.basename(path) + '_sf')
-
-        #     gui.setNamespaceLabel("New imsmanifest.xml has been created!", '#ffff00')
-        # else:
-        #     gui.setNamespaceLabel("Passed: adlnav-Namespace present", '#00ff00')
-
     else:
         label_namespace = gui.tk.Label(gui.root, textvariable=gui.text_namespace, anchor="c", bg='#00ff00')
         label_namespace.place(x=20, y=50, width=460, height=30)
         gui.text_namespace.set("Passed: Namespace not relevant for this SCORM version.")
         # write to excel if multiple files selected
         if multi_files_select: report_data.append("Passed: Namespace not relevant for this SCORM version.")
+
+    # zip scorm package
+    if new_scorm_zip:
+        parent_path = Path(path).parent
+        os.path.join(parent_path.parent, os.path.basename(os.path.dirname(path + "/imsmanifest.xml"))) + '_sf.zip'
+        gui.setLabelStatus("New SCORM package created!", '#ffff00')
+
+        # save manifest.xml
+        saveImsmanifest(rootnode, path + "/imsmanifest.xml")
+        sz.zipDir(path, os.path.basename(path) + '_sf')
 
     # check filenames for special characters
     parent_path = str(Path(path).parent.parent)
