@@ -16,8 +16,6 @@ import disable_time_score as dts
 # pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --icon=schwarz.ico --clean scormTester.py
 #*****************************************************
 
-version = "v2.6 | 17.07.2022"
-
 multi_files_select = False
 report_path = ""
 report_saved = False
@@ -235,7 +233,7 @@ def selectFiles():
             else:
                 print("Media files check disabled.")
 
-print("Scorm-Tester " + version)
+print("Scorm-Tester " + gui.version)
 
 btn_select = gui.tk.Button(gui.root, text="Select File(s)", command=selectFiles, bg='grey')
 btn_select.place(x=180, y=350, width=140, height=30)

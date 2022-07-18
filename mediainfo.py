@@ -20,9 +20,14 @@ def checkAudioVideo(file_input):
     for output in process.stdout:
         info = []
         line = output.strip().split(':')
-        info.append(line[0].strip())
-        info.append(line[1].strip())
-        metadata.append(info)
+        try:
+            info.append(line[0].strip())
+            info.append(line[1].strip())
+            metadata.append(info)
+        except:
+            continue
+
+        # metadata.append(info)
     return metadata
 
 def checkImage(file):

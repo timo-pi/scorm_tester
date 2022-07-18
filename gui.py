@@ -2,11 +2,9 @@ import tkinter as tk
 from tkinter import filedialog, IntVar, Checkbutton, Tk
 
 
-#customtkinter.set_appearance_mode("dark")  # Modes: system (default), light, dark
-#customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
+version = "v2.7 | 18.07.2022"
 
 check_media_files = True
-
 
 def clearLabels():
     label_scorm = tk.Label(root, textvariable=text_empty, anchor="c", bg='grey')
@@ -72,7 +70,7 @@ text_characters.set("Special characters check:")
 text_ttkf.set("TTKF Assessment check:")
 text_time_score.set("Disable learning Time/ Score:")
 text_status.set("Overall status:")
-root.title('SIT | SCORM Tester v2.5 | 23.05.2022')
+root.title('SIT | SCORM Tester '+ version)
 
 # Buttons
 
