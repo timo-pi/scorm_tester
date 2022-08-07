@@ -8,20 +8,40 @@ import re, os
 # x = re.sub(r',(.\(.\.SESSION_TIME,.\),)(.\(.\.EXIT)', r',/*\1*/\2', txt)
 # y = re.sub(r',(.\(.\.SESSION_TIME,.\),)(.\(.\.EXIT)', r',/*\1*/\2', txt2)
 
-new_script = []
+# new_script = []
+new_script = ''
 
 def change_articulate_scormdriver(path):
     try:
+        # with open(path, 'r') as f:
+        #     scormdriver_lines = f.readlines()
+        #     for line in scormdriver_lines:
+        #         # SCORM 2004
+        #         line = re.sub(r'function SCORM2004_SaveTime\(intMilliSeconds\){(.*?)}', r'function SCORM2004_SaveTime(intMilliSeconds){return 0;}', line)
+        #         line = re.sub(r'function SCORM2004_SetScore\(intScore,intMaxScore,intMinScore\){(.*?)}', r'function SCORM2004_SetScore(intScore,intMaxScore,intMinScore){return 0;}', line)
+        #         # SCORM 1.2
+        #         line = re.sub(r'function SCORM_SaveTime\(intMilliSeconds\){(.*?)}', r'function SCORM_SaveTime(intMilliSeconds){return 0;}', line)
+        #         line = re.sub(r'function SCORM_SetScore\(intScore,intMaxScore,intMinScore\){(.*?)}', r'function SCORM_SetScore(intScore,intMaxScore,intMinScore){return 0;}', line)
+        #         new_script.append(line)
+        #
+        # with open(path, 'w') as f:
+        #     f.writelines(new_script)
+
         with open(path, 'r') as f:
             scormdriver_lines = f.readlines()
             for line in scormdriver_lines:
-                # SCORM 2004
-                line = re.sub(r'function SCORM2004_SaveTime\(intMilliSeconds\){(.*?)}', r'function SCORM2004_SaveTime(intMilliSeconds){return 0;}', line)
-                line = re.sub(r'function SCORM2004_SetScore\(intScore,intMaxScore,intMinScore\){(.*?)}', r'function SCORM2004_SetScore(intScore,intMaxScore,intMinScore){return 0;}', line)
-                # SCORM 1.2
-                line = re.sub(r'function SCORM_SaveTime\(intMilliSeconds\){(.*?)}', r'function SCORM_SaveTime(intMilliSeconds){return 0;}', line)
-                line = re.sub(r'function SCORM_SetScore\(intScore,intMaxScore,intMinScore\){(.*?)}', r'function SCORM_SetScore(intScore,intMaxScore,intMinScore){return 0;}', line)
-                new_script.append(line)
+                global new_script
+                new_script = new_script + line
+        # SCORM 2004
+        new_script = re.sub(r'function SCORM2004_SaveTime\(intMilliSeconds\){(.*[\s\S]*?)}',
+                            r'function SCORM2004_SaveTime(intMilliSeconds){return 0;}', new_script)
+        new_script = re.sub(r'function SCORM2004_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.*[\s\S]*?)}',
+                            r'function SCORM2004_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_script)
+        # SCORM 1.2
+        new_script = re.sub(r'function SCORM_SaveTime\(intMilliSeconds\){(.*[\s\S]*?)}',
+                            r'function SCORM_SaveTime(intMilliSeconds){return 0;}', new_script)
+        new_script = re.sub(r'function SCORM_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.*[\s\S]*?)}',
+                            r'function SCORM_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_script)
 
         with open(path, 'w') as f:
             f.writelines(new_script)
