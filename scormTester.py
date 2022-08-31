@@ -9,6 +9,7 @@ import mediainfo
 # import lms_upload as lms
 import gui
 import disable_time_score as dts
+import lms_upload
 
 #*****************************************************
 # Command to build exe:
@@ -205,33 +206,40 @@ def runChecks(path):
 
 def selectFiles():
     gui.root.filenames = filedialog.askopenfilenames(initialdir="/", title="Select file", filetypes=(("all files", "*.*"), ("all files", "*.*")))
+    global multi_files_select, report_path, report_saved
+
     if len(gui.root.filenames) == 1:
-        print("FILE: " + str(gui.root.filenames))
+        report_path = os.path.dirname(gui.root.filenames[0])
+        zip_files = []
+        zip_files.append(str(gui.root.filenames[0]))
+        print("FILES: ", zip_files)
         media_path = runChecks(sz.extractScorm(gui.root.filenames[0]))
         if gui.checkbox_media_test.get():
             mediainfo.checkMediaFiles([media_path], gui.checkbox_svg.get())
         else:
             print("Media files check disabled.")
-
-        # LMS-Upload
-        # if gui.checkbox_lms.get():
-        #     lms.start_upload(media_path)
-
+        we.write_lms_upload_sheet(report_path, zip_files)
 
     # MULTIPLE FILES SELECTED
     elif len(gui.root.filenames) > 1:
-        global multi_files_select, report_path, report_saved
+        #global multi_files_select, report_path, report_saved
         multi_files_select = True
         report_path = os.path.dirname(gui.root.filenames[0])
         report_saved = we.createReport(report_path)
+        zip_files = []
         for i in gui.root.filenames:
-            print("FILE: " + str(i))
+            zip_files.append(str(i))
             gui.clearLabels()
             media_path = runChecks(sz.extractScorm(i))
             if gui.checkbox_media_test.get():
                 mediainfo.checkMediaFiles([media_path], gui.checkbox_svg.get())
             else:
                 print("Media files check disabled.")
+        print(zip_files)
+        we.write_lms_upload_sheet(report_path, zip_files)
+
+    # activate LMS-Upload-Button
+    gui.btn_upload['state'] = 'normal'
 
 print("Scorm-Tester " + gui.version)
 

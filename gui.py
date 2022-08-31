@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, IntVar, Checkbutton, Tk
+import lms_upload
 
-
-version = "v2.8 | 23.08.2022"
+version = "v3.0 | 31.08.2022"
 
 check_media_files = True
 
@@ -58,7 +58,7 @@ def toggleSvgCheck():
 
 root = Tk()  # create CTk window like you do with the Tk window
 
-root.geometry("500x500")
+root.geometry("500x550")
 root.configure(bg='grey')
 
 text_scorm, text_namespace, text_item, text_characters, text_ttkf, text_time_score, text_status, text_empty = tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar(), tk.StringVar()
@@ -75,7 +75,9 @@ root.title('SIT | SCORM Tester '+ version)
 # Buttons
 
 btn_quit = tk.Button(root, text="Quit", command=lambda: root.destroy(), bg='grey')
-btn_quit.place(x=180, y=390, width=140, height=30)
+btn_quit.place(x=180, y=430, width=140, height=30)
+btn_upload = tk.Button(root, text="Start LMS Upload", command=lambda: lms_upload.start_upload(), bg='grey', state='disabled')
+btn_upload.place(x=180, y=390, width=140, height=30)
 
 checkbox_media_test = IntVar()
 checkbox_media_test.set(True)

@@ -59,4 +59,17 @@ def createItemsReport(path, data):
     except:
         print("Not possible to write items-report - file maybe open?")
 
-
+def write_lms_upload_sheet(path, data):
+    wb = Workbook()
+    ws = wb.active
+    ws.column_dimensions['A'].width = 120
+    ws.append(['ZIP-FILES for LMS-Upload'])
+    for i in data:
+        row = []
+        row.append(i)
+        ws.append(row)
+    try:
+        wb.save(os.path.join(path, "LMS-Upload-Sheet.xlsx"))
+        wb.close()
+    except:
+        print("Not possible to write LMS-Upload-Sheet - file maybe open?")

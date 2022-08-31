@@ -1,0 +1,8 @@
+Backlog:
+- Parse SCORM-Files from LMS-Upload-Sheet.xlsx into lms_upload Script
+- Write LMS-Item-Names into LMS-Upload-Sheet.xlsx or in a new report file
+
+Nice To Have:
+- Add country Testusers to ini file and import them into upload script
+- Write Testusers from ini file in LMS-Upload-Sheet.xlsx
+- Parse Testusers from LMS-Upload-Sheet.xlsx into LMS-Upload/ Assignments

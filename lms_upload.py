@@ -1,16 +1,13 @@
 import os.path
-
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import Select
 import time
 import random
-from selenium.webdriver.common.action_chains import ActionChains
 from configparser import ConfigParser
+
 
 file_path = r'C:\Users\piechotta\Downloads'
 file_name = r"Testpaket_2.zip"
@@ -19,7 +16,7 @@ file_name = r"Testpaket_2.zip"
 config = ConfigParser()
 config.read('.\scormtester.ini')
 user_name = config.get('login', 'username')
-sf_password  = config.get('login', 'password')
+sf_password = config.get('login', 'password')
 wait_time = int(config.get('settings', 'wait_time'))
 login_url = config.get('settings','login_url')
 startpage_url = config.get('settings', 'startpage_url')
@@ -27,18 +24,28 @@ admin_center_url= config.get('settings', 'admin_center_url')
 import_content_url = config.get('settings','import_content_url')
 manage_assignments_url = config.get('settings', 'manage_assignments_url')
 
+SCORM_path = ''
+scorm_id = ''
+random_prefix = ''
+driver = ''
 
-edge = Service('msedgedriver.exe')
-SCORM_path = os.path.join(file_path, file_name)
-# SCORM_path = r'C:\Users\piechotta\Downloads\Testpaket.zip'
-random_prefix = str(random.uniform(0, 1))[2:6]
-scorm_id = random_prefix + "_" + file_name[:-4]
-print(scorm_id)
-driver = webdriver.Edge(service=edge)
+def initialize():
+    global SCORM_path
+    global scorm_id
+    global random_prefix
+    global driver
+
+    SCORM_path = os.path.join(file_path, file_name)
+
+    random_prefix = str(random.uniform(0, 1))[2:6]
+    scorm_id = random_prefix + "_" + file_name[:-4]
+    print(scorm_id)
+    edge = Service('msedgedriver.exe')
+    driver = webdriver.Edge(service=edge)
 
 
-def start_upload(media_path):
-
+def start_upload():
+    initialize()
     driver.maximize_window()
     driver.get(login_url)
     # driver.quit()
@@ -64,11 +71,11 @@ def start_upload(media_path):
     #driver.find_element(By.ID, 'nextButton').click()
 
     driver.execute_script('''
-    		$('#buttons2').show();
-    		$('#buttons3').show();
-    		$('#header2').show();
-    		$('#configureSettings').show();
-    		$('#breadCrumbStep3').show();
+            $('#buttons2').show();
+            $('#buttons3').show();
+            $('#header2').show();
+            $('#configureSettings').show();
+            $('#breadCrumbStep3').show();
     ''')
     driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "CONTENTTEST";')
     driver.execute_script('document.getElementById("cpdomain").value = "TESTING";')
@@ -102,6 +109,7 @@ def start_upload(media_path):
 
     # Wait until upload is finished
     next_action('editContentObjectIDIcon', 'wait')
+    time.sleep(3)
     next_action('editContentObjectIDIcon', 'click')
     driver.switch_to.window(driver.window_handles[1])
 
@@ -171,5 +179,3 @@ def next_action(id, action):
         driver.find_element(By.ID, id).clear()
     else:
         driver.find_element(By.ID, id).send_keys(action)
-
-start_upload("test")
