@@ -6,14 +6,15 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 import time
+import random
 
 sf_url = 'https://hcm12preview.sapsf.eu/login?company=lidlstiftuT3&loginMethod=PWD#/login'
-user_name = 'INT-PIECHOTTA'
-sf_password = 'Freeway22!'
+user_name = '***'
+sf_password = '***'
 s = Service('msedgedriver.exe')
 SCORM_path = r'C:\temp2\dummy-scorm.zip'
 # SCORM_id = 'Test_310522_2'
-
+random_prefix = str(random.uniform(1000,9999))
 
 def start_upload(media_path):
     driver = webdriver.Edge(service=s)
@@ -47,7 +48,8 @@ def start_upload(media_path):
     ''')
     driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "CONTENTTEST";')
     driver.execute_script('document.getElementById("cpdomain").value = "TESTING";')
-    driver.execute_script('document.getElementById("contentPackageID").value = "Test_050622_3";')
+    scorm_id = random_prefix + "_Automatisierung"
+    driver.execute_script('document.getElementById("contentPackageID").value = "' + scorm_id + '";')
     driver.find_element(By.ID, 'finishButton').click()
 
     # Wait until upload is finished
@@ -82,7 +84,7 @@ def start_upload(media_path):
 
     # Get scroll height
     last_height = driver.execute_script("return document.body.scrollHeight")
-    print("last_height: " + last_height)
+    print("last_height: ", last_height)
 
     while True:
         # Scroll down to bottom
@@ -96,7 +98,7 @@ def start_upload(media_path):
         if new_height == last_height:
             break
         last_height = new_height
-        print("new_height: " + new_height)
+        print("new_height: ", new_height)
 
 
 

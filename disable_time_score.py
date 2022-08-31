@@ -8,8 +8,8 @@ import re, os
 # x = re.sub(r',(.\(.\.SESSION_TIME,.\),)(.\(.\.EXIT)', r',/*\1*/\2', txt)
 # y = re.sub(r',(.\(.\.SESSION_TIME,.\),)(.\(.\.EXIT)', r',/*\1*/\2', txt2)
 
-# new_script = []
-new_script = ''
+new_runjs = []
+new_scormdriver = ''
 
 def change_articulate_scormdriver(path):
     try:
@@ -30,21 +30,21 @@ def change_articulate_scormdriver(path):
         with open(path, 'r') as f:
             scormdriver_lines = f.readlines()
             for line in scormdriver_lines:
-                global new_script
-                new_script = new_script + line
+                global new_scormdriver
+                new_scormdriver = new_scormdriver + line
         # SCORM 2004
-        new_script = re.sub(r'function SCORM2004_SaveTime\(intMilliSeconds\){(.*[\s\S]*?)}',
-                            r'function SCORM2004_SaveTime(intMilliSeconds){return 0;}', new_script)
-        new_script = re.sub(r'function SCORM2004_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.*[\s\S]*?)}',
-                            r'function SCORM2004_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_script)
+        new_scormdriver = re.sub(r'function SCORM2004_SaveTime\(intMilliSeconds\){(.*[\s\S]*?)}',
+                            r'function SCORM2004_SaveTime(intMilliSeconds){return 0;}', new_scormdriver)
+        new_scormdriver = re.sub(r'function SCORM2004_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.*[\s\S]*?)}',
+                            r'function SCORM2004_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_scormdriver)
         # SCORM 1.2
-        new_script = re.sub(r'function SCORM_SaveTime\(intMilliSeconds\){(.*[\s\S]*?)}',
-                            r'function SCORM_SaveTime(intMilliSeconds){return 0;}', new_script)
-        new_script = re.sub(r'function SCORM_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.*[\s\S]*?)}',
-                            r'function SCORM_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_script)
+        new_scormdriver = re.sub(r'function SCORM_SaveTime\(intMilliSeconds\){(.*[\s\S]*?)}',
+                            r'function SCORM_SaveTime(intMilliSeconds){return 0;}', new_scormdriver)
+        new_scormdriver = re.sub(r'function SCORM_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.*[\s\S]*?)}',
+                            r'function SCORM_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_scormdriver)
 
         with open(path, 'w') as f:
-            f.writelines(new_script)
+            f.writelines(new_scormdriver)
         return "Scormdriver has been modified!"
     except:
         print("Error modifying Scormdriver!")
@@ -58,10 +58,10 @@ def change_runjs(path):
                 line = re.sub(r',(.\(.\.SESSION_TIME,.\),)(.\(.\.EXIT)', r',/*\1*/\2', line)
                 line = re.sub(r',.\.setValue\(.\.SCORE_SCALED[^1]*100\)', r' ', line)
                 line = re.sub(r',.\.setValue\(.\.SCORE_RAW.*?SCORE_MAX\)\)', r' ', line)
-                new_script.append(line)
+                new_runjs.append(line)
 
         with open(path, 'w') as f:
-            f.writelines(new_script)
+            f.writelines(new_runjs)
         print("run.js has been modified")
         return "run.js has been modified"
     except:

@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, IntVar, Checkbutton, Tk
 
 
-version = "v2.7 | 18.07.2022"
+version = "v2.8 | 23.08.2022"
 
 check_media_files = True
 
