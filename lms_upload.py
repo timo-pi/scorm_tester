@@ -12,21 +12,24 @@ import gui
 import writeExcel as we
 
 
-file_path = r'C:\Users\piechotta\Downloads'
-file_name = r"Testpaket_2.zip"
+#file_path = r'C:\Users\piechotta\Downloads'
+#file_name = r"Testpaket_2.zip"
 #sf_url = 'https://hcm12preview.sapsf.eu/login?company=lidlstiftuT3&loginMethod=PWD#/login'
 
 config = ConfigParser()
 config.read('.\scormtester.ini')
 user_name = config.get('login', 'username')
 sf_password = config.get('login', 'password')
-wait_time = int(config.get('settings', 'wait_time'))
+wait_time = config.getint('settings', 'wait_time')
 login_url = config.get('settings','login_url')
 startpage_url = config.get('settings', 'startpage_url')
 admin_center_url= config.get('settings', 'admin_center_url')
 import_content_url = config.get('settings','import_content_url')
 manage_assignments_url = config.get('settings', 'manage_assignments_url')
-
+testusers = config.get('settings', 'testusers')
+testuser_list = testusers.split (',')
+email = config.get('settings', 'email')
+lms_send_mail = config.getboolean('settings', 'lms_send_mail')
 scorm_id = ''
 random_prefix = ''
 driver = ''
@@ -63,7 +66,6 @@ def start_upload(file_path):
     driver.find_element(By.ID, 'submitbutton').click()
     browse_btn = driver.find_element(By.ID, 'pickFiles')
     browse_btn.send_keys(file_path)
-    #driver.find_element(By.ID, 'nextButton').click()
 
     driver.execute_script('''
             $('#buttons2').show();
@@ -97,14 +99,14 @@ def start_upload(file_path):
     driver.find_element(By.ID, 'skipContentStructurePage').click()
     driver.find_element(By.ID, 'recordWhenLastObjectPassed').click()
     next_action('onlineCompletionStatus', 'TEST_COMPL')
-
+    time.sleep(2)
     #driver.find_element(By.ID, 'componentID').send_keys(scorm_id)
     driver.find_element(By.ID, 'finishButton').click()
 
-
+    time.sleep(2)
     # Wait until upload is finished
     next_action('editContentObjectIDIcon', 'wait')
-    time.sleep(3)
+    time.sleep(2)
     next_action('editContentObjectIDIcon', 'click')
     driver.switch_to.window(driver.window_handles[1])
 
@@ -116,6 +118,14 @@ def start_upload(file_path):
     driver.switch_to.window(driver.window_handles[0])
 
     driver.find_element(By.ID, 'schedButton').click()
+
+    #email Notification
+    if lms_send_mail == True:
+        next_action('emailAddress', 'clear')
+        next_action('emailAddress', email)
+    else:
+        next_action('emailNotificationEnabled', 'click')
+
     driver.find_element(By.ID, 'submitbutton').click()
 
     # Wait until Successfully Deployed
@@ -145,10 +155,15 @@ def start_upload(file_path):
     next_action('addCpnt', 'click')
     next_action('submitbutton', 'click')
     next_action('studentId', 'click')
-    next_action('studentId', 'INT-PIECHOTTA')
-    next_action('submitbutton', 'click')
-    next_action('nextButton', 'click')
 
+    # Assign Testusers
+
+    for user in testuser_list:
+        next_action('studentId', user)
+        next_action('submitbutton', 'click')
+        time.sleep(2)
+
+    next_action('nextButton', 'click')
     time.sleep(2)
     next_action('addOneCpntType', 'ELEARNING')
     next_action('id', scorm_id)
@@ -182,4 +197,4 @@ def read_upload_sheet(path):
         start_upload(file)
 
     gui.clearLabels()
-    gui.setLabelStatus('LMS-Upload succsessful!')
+    gui.setLabelStatus('LMS-Upload succsessful!', '#00ff00')

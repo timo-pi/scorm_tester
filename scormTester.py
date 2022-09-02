@@ -13,7 +13,7 @@ import lms_upload
 
 #*****************************************************
 # Command to build exe:
-# pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --add-data "lms_upload.py" --add-data "scormtester.ini" --add-data "msedgedriver.exe --icon=schwarz.ico --clean scormTester.py
+# pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --add-data "lms_upload.py;." --add-data "scormtester.ini;." --add-data "msedgedriver.exe;." --icon=schwarz.ico --clean scormTester.py
 #*****************************************************
 
 multi_files_select = False
