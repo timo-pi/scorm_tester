@@ -76,8 +76,6 @@ root.title('SIT | SCORM Tester '+ version)
 
 btn_quit = tk.Button(root, text="Quit", command=lambda: root.destroy(), bg='grey')
 btn_quit.place(x=180, y=430, width=140, height=30)
-btn_upload = tk.Button(root, text="Start LMS Upload", command=lambda: lms_upload.start_upload(), bg='grey', state='disabled')
-btn_upload.place(x=180, y=390, width=140, height=30)
 
 checkbox_media_test = IntVar()
 checkbox_media_test.set(True)

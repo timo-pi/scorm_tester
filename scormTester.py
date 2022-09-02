@@ -13,14 +13,14 @@ import lms_upload
 
 #*****************************************************
 # Command to build exe:
-# pyinstaller --noconfirm --onefile --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --icon=schwarz.ico --clean scormTester.py
-# pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --icon=schwarz.ico --clean scormTester.py
+# pyinstaller --noconfirm --onedir --add-data "writeExcel.py;." --add-data "xmlHelper.py;." --add-data "scormZipper.py;." --add-data "mediainfo.py;." --add-data "gui.py;." --add-data "exiftool.exe;." --add-data "run_20.js;." --add-data "run_21.js;." --add-data "disable_time_score.py;." --add-data "lms_upload.py" --add-data "scormtester.ini" --add-data "msedgedriver.exe --icon=schwarz.ico --clean scormTester.py
 #*****************************************************
 
 multi_files_select = False
 report_path = ""
 report_saved = False
 new_scorm_zip = False
+files_to_upload = []
 #global checkbox_svg, label_characters, SCORM_2004_4, new_scorm_zip, label_scorm, label_namespace, label_item
 
 def saveImsmanifest(rootnode, path):
@@ -31,6 +31,7 @@ def saveImsmanifest(rootnode, path):
     ##sz.zipScorm(path)
 
 def runChecks(path):
+    global files_to_upload
     SCORM_2004_4 = False
     path = path.replace('\\', '/')
     report_data = [path]
@@ -173,6 +174,11 @@ def runChecks(path):
         # save manifest.xml
         saveImsmanifest(rootnode, path + "/imsmanifest.xml")
         sz.zipDir(path, os.path.basename(path) + '_sf')
+        file = os.path.join(Path(path).parent.parent, os.path.basename(path) + '_sf.zip')
+        files_to_upload.append(file)
+    else:
+        file = os.path.join(Path(path).parent.parent, os.path.basename(path) + '.zip')
+        files_to_upload.append(file)
 
     # check filenames for special characters
     parent_path = str(Path(path).parent.parent)
@@ -206,19 +212,19 @@ def runChecks(path):
 
 def selectFiles():
     gui.root.filenames = filedialog.askopenfilenames(initialdir="/", title="Select file", filetypes=(("all files", "*.*"), ("all files", "*.*")))
-    global multi_files_select, report_path, report_saved
+    global multi_files_select, report_path, report_saved, files_to_upload
 
     if len(gui.root.filenames) == 1:
         report_path = os.path.dirname(gui.root.filenames[0])
-        zip_files = []
-        zip_files.append(str(gui.root.filenames[0]))
-        print("FILES: ", zip_files)
+        #zip_files = []
+        #zip_files.append(str(gui.root.filenames[0]))
         media_path = runChecks(sz.extractScorm(gui.root.filenames[0]))
         if gui.checkbox_media_test.get():
             mediainfo.checkMediaFiles([media_path], gui.checkbox_svg.get())
         else:
             print("Media files check disabled.")
-        we.write_lms_upload_sheet(report_path, zip_files)
+        we.write_lms_upload_sheet(report_path, files_to_upload)
+
 
     # MULTIPLE FILES SELECTED
     elif len(gui.root.filenames) > 1:
@@ -226,23 +232,25 @@ def selectFiles():
         multi_files_select = True
         report_path = os.path.dirname(gui.root.filenames[0])
         report_saved = we.createReport(report_path)
-        zip_files = []
         for i in gui.root.filenames:
-            zip_files.append(str(i))
+            #zip_files.append(str(i))
             gui.clearLabels()
             media_path = runChecks(sz.extractScorm(i))
             if gui.checkbox_media_test.get():
                 mediainfo.checkMediaFiles([media_path], gui.checkbox_svg.get())
             else:
                 print("Media files check disabled.")
-        print(zip_files)
-        we.write_lms_upload_sheet(report_path, zip_files)
+        we.write_lms_upload_sheet(report_path, files_to_upload)
 
     # activate LMS-Upload-Button
-    gui.btn_upload['state'] = 'normal'
+    btn_upload['state'] = 'normal'
 
 print("Scorm-Tester " + gui.version)
 
 btn_select = gui.tk.Button(gui.root, text="Select File(s)", command=selectFiles, bg='grey')
 btn_select.place(x=180, y=350, width=140, height=30)
+
+btn_upload = gui.tk.Button(gui.root, text="Start LMS Upload", command=lambda: lms_upload.read_upload_sheet(report_path), bg='grey', state='disabled')
+btn_upload.place(x=180, y=390, width=140, height=30)
+
 gui.root.mainloop()

@@ -1,4 +1,5 @@
 Backlog:
+- new created _SF Files must be processed. not always the original SCORM-File!
 - Parse SCORM-Files from LMS-Upload-Sheet.xlsx into lms_upload Script
 - Write LMS-Item-Names into LMS-Upload-Sheet.xlsx or in a new report file
 

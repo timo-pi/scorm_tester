@@ -31,18 +31,18 @@ def writeReport(path, data):
     except:
         return False
 
-def writeSheetTwo(data, path):
-    try:
-        wb = load_workbook(path)
-        ws = wb.create_sheet('Sheet 2')
-        ws.append(data)
-        #wb.save(os.path.join(path, "SCORM-Test-Report.xlsx"))
-        wb.save(path)
-        wb.close()
-    except:
-        print("*** Error adding page 2 ***")
-        print(path)
-        return False
+# def writeSheetTwo(data, path):
+#     try:
+#         wb = load_workbook(path)
+#         ws = wb.create_sheet('Sheet 2')
+#         ws.append(data)
+#         #wb.save(os.path.join(path, "SCORM-Test-Report.xlsx"))
+#         wb.save(path)
+#         wb.close()
+#     except:
+#         print("*** Error adding page 2 ***")
+#         print(path)
+#         return False
 
 def createItemsReport(path, data):
     wb = Workbook()
@@ -73,3 +73,39 @@ def write_lms_upload_sheet(path, data):
         wb.close()
     except:
         print("Not possible to write LMS-Upload-Sheet - file maybe open?")
+
+def lms_upload_sheet(path):
+    try:
+        wb = load_workbook(os.path.join(path, "LMS-Upload-Sheet.xlsx"))
+        print(os.path.join(path, "LMS-Upload-Sheet.xlsx"))
+        ws = wb.active
+        row_a = ws['A']
+        scorm_files = []
+        for i in row_a:
+            print(i.value)
+            scorm_files.append(i.value)
+        scorm_files.pop(0)
+        print(scorm_files)
+        #ws.append(data)
+        #wb.save(os.path.join(path, "SCORM-Test-Report.xlsx"))
+        wb.close()
+        return scorm_files
+    except:
+        return False
+
+def add_items_to_upload_sheet(path, item):
+
+    try:
+        wb = load_workbook(os.path.join(path, "LMS-Upload-Sheet.xlsx"))
+        sheets = wb.sheetnames
+        if 'Items' in sheets:
+            ws = wb.get_sheet_by_name('Items')
+            ws.append([item])
+        else:
+            ws2 = wb.create_sheet()
+            ws2.title = "Items"
+            ws2.append([item])
+        wb.save(os.path.join(path, "LMS-Upload-Sheet.xlsx"))
+        wb.close()
+    except:
+        return False

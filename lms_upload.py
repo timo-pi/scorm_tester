@@ -8,6 +8,9 @@ import time
 import random
 from configparser import ConfigParser
 
+import gui
+import writeExcel as we
+
 
 file_path = r'C:\Users\piechotta\Downloads'
 file_name = r"Testpaket_2.zip"
@@ -24,31 +27,17 @@ admin_center_url= config.get('settings', 'admin_center_url')
 import_content_url = config.get('settings','import_content_url')
 manage_assignments_url = config.get('settings', 'manage_assignments_url')
 
-SCORM_path = ''
 scorm_id = ''
 random_prefix = ''
 driver = ''
 
 def initialize():
-    global SCORM_path
-    global scorm_id
-    global random_prefix
     global driver
 
-    SCORM_path = os.path.join(file_path, file_name)
-
-    random_prefix = str(random.uniform(0, 1))[2:6]
-    scorm_id = random_prefix + "_" + file_name[:-4]
-    print(scorm_id)
     edge = Service('msedgedriver.exe')
     driver = webdriver.Edge(service=edge)
-
-
-def start_upload():
-    initialize()
     driver.maximize_window()
     driver.get(login_url)
-    # driver.quit()
 
     # Login
     next_action('__input1-inner', 'wait')
@@ -59,6 +48,12 @@ def start_upload():
     next_action('__button2-inner', 'wait')
     driver.find_element(By.ID, '__button2-inner').click()
 
+def start_upload(file_path):
+    global scorm_id
+    global random_prefix
+
+    random_prefix = str(random.uniform(0, 1))[2:6]
+    scorm_id = random_prefix + "_" + str(os.path.basename(file_path))[:-4]
     # open Admin-Page
     driver.get(admin_center_url)
     time.sleep(wait_time)
@@ -67,7 +62,7 @@ def start_upload():
     # Upload SCORM-File
     driver.find_element(By.ID, 'submitbutton').click()
     browse_btn = driver.find_element(By.ID, 'pickFiles')
-    browse_btn.send_keys(SCORM_path)
+    browse_btn.send_keys(file_path)
     #driver.find_element(By.ID, 'nextButton').click()
 
     driver.execute_script('''
@@ -125,14 +120,20 @@ def start_upload():
 
     # Wait until Successfully Deployed
     time.sleep(wait_time)
-    while True:
-        time.sleep(3)
-        deployment_status = driver.execute_script('''return document.querySelector('[id*="jobStatus"]').innerHTML''')
-        if str(deployment_status) == 'Succeeded':
-            break
-        else:
-            print(deployment_status)
-    print("finished")
+    try:
+        while True:
+            deployment_status = driver.execute_script('''return document.querySelector('[id*="jobStatus"]').innerHTML''')
+            if str(deployment_status) == 'Succeeded':
+                break
+            else:
+                time.sleep(3)
+                print(deployment_status)
+        print("finished")
+    except:
+        print('Warning: Unable to read deployment status.')
+
+    print(scorm_id)
+    we.add_items_to_upload_sheet(os.path.dirname(file_path), scorm_id)
 
     driver.get(manage_assignments_url)
 
@@ -162,13 +163,6 @@ def start_upload():
     time.sleep(2)
     driver.get(startpage_url)
 
-    # Edit Item Settings
-    # driver.get('https://lidlstiftu-stage.plateau.com/learning/search/initSearch.do?searchType=0&selectorName=Component&stackID=search&entityManagerEnabled=Y')
-    # time.sleep(wait_time)
-    # next_action('componentTitle', scorm_id)
-    # next_action('search0', 'click')
-    # time.sleep(2)
-    # driver.find_element(By.PARTIAL_LINK_TEXT, 'ELEARNING').click()
 
 def next_action(id, action):
     if action == 'click':
@@ -179,3 +173,13 @@ def next_action(id, action):
         driver.find_element(By.ID, id).clear()
     else:
         driver.find_element(By.ID, id).send_keys(action)
+
+def read_upload_sheet(path):
+    print("report_path: ", path)
+    upload_files = we.lms_upload_sheet(path)
+    initialize()
+    for file in upload_files:
+        start_upload(file)
+
+    gui.clearLabels()
+    gui.setLabelStatus('LMS-Upload succsessful!')
