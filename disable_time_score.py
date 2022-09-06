@@ -11,22 +11,35 @@ import re, os
 new_runjs = []
 new_scormdriver = ''
 
-def change_articulate_scormdriver(path):
+def change_rise_scormdriver(path):
     try:
-        # with open(path, 'r') as f:
-        #     scormdriver_lines = f.readlines()
-        #     for line in scormdriver_lines:
-        #         # SCORM 2004
-        #         line = re.sub(r'function SCORM2004_SaveTime\(intMilliSeconds\){(.*?)}', r'function SCORM2004_SaveTime(intMilliSeconds){return 0;}', line)
-        #         line = re.sub(r'function SCORM2004_SetScore\(intScore,intMaxScore,intMinScore\){(.*?)}', r'function SCORM2004_SetScore(intScore,intMaxScore,intMinScore){return 0;}', line)
-        #         # SCORM 1.2
-        #         line = re.sub(r'function SCORM_SaveTime\(intMilliSeconds\){(.*?)}', r'function SCORM_SaveTime(intMilliSeconds){return 0;}', line)
-        #         line = re.sub(r'function SCORM_SetScore\(intScore,intMaxScore,intMinScore\){(.*?)}', r'function SCORM_SetScore(intScore,intMaxScore,intMinScore){return 0;}', line)
-        #         new_script.append(line)
-        #
-        # with open(path, 'w') as f:
-        #     f.writelines(new_script)
+        with open(path, 'r') as f:
+            scormdriver_lines = f.readlines()
+            for line in scormdriver_lines:
+                global new_scormdriver
+                new_scormdriver = new_scormdriver + line
 
+        # SCORM 2004
+        #new_scormdriver = new_scormdriver.replace('\n', ' ')
+        new_scormdriver = re.sub(r'function SCORM2004_SaveTime\(intMilliSeconds\){(.* ?)}',
+                            r'function SCORM2004_SaveTime(intMilliSeconds){return 0;}', new_scormdriver)
+        new_scormdriver = re.sub(r'function SCORM2004_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.* ?)}',
+                            r'function SCORM2004_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_scormdriver)
+        # SCORM 1.2
+        new_scormdriver = re.sub(r'function SCORM_SaveTime\(intMilliSeconds\){(.* ?)}',
+                            r'function SCORM_SaveTime(intMilliSeconds){return 0;}', new_scormdriver)
+        new_scormdriver = re.sub(r'function SCORM_SetScore\(intScore,\s*intMaxScore,\s*intMinScore\){(.* ?)}',
+                            r'function SCORM_SetScore(intScore,intMaxScore,intMinScore){return 0;}', new_scormdriver)
+
+        with open(path, 'w') as f:
+            f.writelines(new_scormdriver)
+        return "Scormdriver has been modified!"
+    except:
+        print("Error modifying Scormdriver!")
+        return "Error modifying Scormdriver"
+
+def change_storyline_scormdriver(path):
+    try:
         with open(path, 'r') as f:
             scormdriver_lines = f.readlines()
             for line in scormdriver_lines:
@@ -50,6 +63,7 @@ def change_articulate_scormdriver(path):
         print("Error modifying Scormdriver!")
         return "Error modifying Scormdriver"
 
+
 def change_runjs(path):
     try:
         with open(path, 'r') as f:
@@ -72,12 +86,12 @@ def disable_time_score(path):
     if os.path.isfile(os.path.join(path, r'scormdriver\scormdriver.js')):
         print("Articulate Rise Content detected!")
         rise_path = os.path.join(path, r'scormdriver/scormdriver.js')
-        result = change_articulate_scormdriver(rise_path)
+        result = change_rise_scormdriver(rise_path)
         return result
     elif os.path.isfile(os.path.join(path, r'lms\scormdriver.js')):
         print("Articulate Storyline Content detected!")
         storyline_path = os.path.join(path, r'lms\scormdriver.js')
-        result = change_articulate_scormdriver(storyline_path)
+        result = change_storyline_scormdriver(storyline_path)
         return result
     elif os.path.isfile(os.path.join(path, r'com.tts.player\src\run.js')):
         print("TTKF Content detected!")

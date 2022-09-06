@@ -248,9 +248,9 @@ def selectFiles():
 print("Scorm-Tester " + gui.version)
 
 btn_select = gui.tk.Button(gui.root, text="Select File(s)", command=selectFiles, bg='grey')
-btn_select.place(x=180, y=350, width=140, height=30)
+btn_select.place(x=180, y=400, width=140, height=30)
 
 btn_upload = gui.tk.Button(gui.root, text="Start LMS Upload", command=lambda: lms_upload.read_upload_sheet(report_path), bg='grey', state='disabled')
-btn_upload.place(x=180, y=390, width=140, height=30)
+btn_upload.place(x=180, y=440, width=140, height=30)
 
 gui.root.mainloop()

@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, IntVar, Checkbutton, Tk
+from tkinter import filedialog, IntVar, Checkbutton, Tk, ttk
 import lms_upload
 
 version = "v3.0 | 31.08.2022"
@@ -75,23 +75,37 @@ root.title('SIT | SCORM Tester '+ version)
 # Buttons
 
 btn_quit = tk.Button(root, text="Quit", command=lambda: root.destroy(), bg='grey')
-btn_quit.place(x=180, y=430, width=140, height=30)
+btn_quit.place(x=180, y=480, width=140, height=30)
+
+label_group_settings = tk.Label(root, borderwidth=2, relief="groove", bg='grey')
+label_group_settings.place(x=10, y=250, width=480, height=65)
 
 checkbox_media_test = IntVar()
 checkbox_media_test.set(True)
-tk.Checkbutton(root, text="Create Media Files Report", command=toggleMediaCheck, variable=checkbox_media_test, bg='grey').place(x=40, y=280)
+tk.Checkbutton(root, text="Create Media Files Report", command=toggleMediaCheck, variable=checkbox_media_test, bg='grey').place(x=40, y=260)
 
 checkbox_runjs = IntVar()
 checkbox_runjs.set(True)
-tk.Checkbutton(root, text="Replace run.js (if TTKF Assessment)", variable=checkbox_runjs, bg='grey').place(x=250, y=280)
+tk.Checkbutton(root, text="Replace run.js (if TTKF Assessment)", variable=checkbox_runjs, bg='grey').place(x=250, y=260)
 
 checkbox_svg = IntVar()
 checkbox_svg.set(True)
-tk.Checkbutton(root, text="Exclude ttkf player directory", command=toggleSvgCheck, variable=checkbox_svg, bg='grey').place(x=40, y=300)
+tk.Checkbutton(root, text="Exclude ttkf player directory", command=toggleSvgCheck, variable=checkbox_svg, bg='grey').place(x=40, y=280)
 
 checkbox_disable_time_score = IntVar()
 checkbox_disable_time_score.set(False)
-tk.Checkbutton(root, text="Disable time+score (TTKF, Storyline, Rise)", variable=checkbox_disable_time_score, bg='grey').place(x=250, y=300)
+tk.Checkbutton(root, text="Disable time+score (TTKF, Storyl., Rise)", variable=checkbox_disable_time_score, bg='grey').place(x=250, y=280)
+
+label_group_lms = tk.Label(root, borderwidth=2, relief="groove", bg='grey')
+label_group_lms.place(x=10, y=325, width=480, height=35)
+
+checkbox_lidl_lms = IntVar()
+checkbox_lidl_lms.set(True)
+tk.Checkbutton(root, text="Upload to Lidl LMS", variable=checkbox_lidl_lms, bg='grey').place(x=40, y=330)
+
+checkbox_schwarz_lms = IntVar()
+checkbox_schwarz_lms.set(False)
+tk.Checkbutton(root, text="Upload to Schwarz LMS", variable=checkbox_schwarz_lms, bg='grey').place(x=250, y=330)
 
 # Labels
 label_group = tk.Label(root, borderwidth=2, relief="groove", bg='grey')

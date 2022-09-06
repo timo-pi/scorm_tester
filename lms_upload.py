@@ -11,7 +11,6 @@ from configparser import ConfigParser
 import gui
 import writeExcel as we
 
-
 #file_path = r'C:\Users\piechotta\Downloads'
 #file_name = r"Testpaket_2.zip"
 #sf_url = 'https://hcm12preview.sapsf.eu/login?company=lidlstiftuT3&loginMethod=PWD#/login'
@@ -21,11 +20,19 @@ config.read('.\scormtester.ini')
 user_name = config.get('login', 'username')
 sf_password = config.get('login', 'password')
 wait_time = config.getint('settings', 'wait_time')
-login_url = config.get('settings','login_url')
-startpage_url = config.get('settings', 'startpage_url')
-admin_center_url= config.get('settings', 'admin_center_url')
-import_content_url = config.get('settings','import_content_url')
-manage_assignments_url = config.get('settings', 'manage_assignments_url')
+# Lidl URLs
+login_url = config.get('lidl','login_url')
+startpage_url = config.get('lidl', 'startpage_url')
+admin_center_url= config.get('lidl', 'admin_center_url')
+import_content_url = config.get('lidl','import_content_url')
+manage_assignments_url = config.get('lidl', 'manage_assignments_url')
+# Schwarz URLs
+login_url_s = config.get('schwarz','login_url')
+startpage_url_s = config.get('schwarz', 'startpage_url')
+admin_center_url_s= config.get('schwarz', 'admin_center_url')
+import_content_url_s = config.get('schwarz','import_content_url')
+manage_assignments_url_s = config.get('schwarz', 'manage_assignments_url')
+
 testusers = config.get('settings', 'testusers')
 testuser_list = testusers.split (',')
 email = config.get('settings', 'email')
@@ -34,33 +41,44 @@ scorm_id = ''
 random_prefix = ''
 driver = ''
 
-def initialize():
+def initialize(lms):
     global driver
 
     edge = Service('msedgedriver.exe')
     driver = webdriver.Edge(service=edge)
     driver.maximize_window()
-    driver.get(login_url)
+    if lms == 'lidl':
+        driver.get(login_url)
+        # Login
+        next_action('__input1-inner', 'wait')
+        name_field = driver.find_element(By.ID, '__input1-inner')
+        password_field = driver.find_element(By.ID, '__input2-inner')
+        name_field.send_keys(user_name)
+        password_field.send_keys(sf_password)
+        next_action('__button2-inner', 'wait')
+        driver.find_element(By.ID, '__button2-inner').click()
+    elif lms == 'schwarz':
+        # SSO-Link
+        driver.get(login_url_s)
 
-    # Login
-    next_action('__input1-inner', 'wait')
-    name_field = driver.find_element(By.ID, '__input1-inner')
-    password_field = driver.find_element(By.ID, '__input2-inner')
-    name_field.send_keys(user_name)
-    password_field.send_keys(sf_password)
-    next_action('__button2-inner', 'wait')
-    driver.find_element(By.ID, '__button2-inner').click()
 
-def start_upload(file_path):
+def start_upload(file_path, lms):
     global scorm_id
     global random_prefix
 
     random_prefix = str(random.uniform(0, 1))[2:6]
     scorm_id = random_prefix + "_" + str(os.path.basename(file_path))[:-4]
+
     # open Admin-Page
-    driver.get(admin_center_url)
-    time.sleep(wait_time)
-    driver.get(import_content_url)
+    if lms == 'lidl':
+        driver.get(admin_center_url)
+        time.sleep(wait_time)
+        driver.get(import_content_url)
+    elif lms == 'schwarz':
+        driver.get(admin_center_url_s)
+        time.sleep(wait_time)
+        driver.get(import_content_url_s)
+
     time.sleep(wait_time)
     # Upload SCORM-File
     driver.find_element(By.ID, 'submitbutton').click()
@@ -74,9 +92,9 @@ def start_upload(file_path):
             $('#configureSettings').show();
             $('#breadCrumbStep3').show();
     ''')
-    driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "CONTENTTEST";')
-    driver.execute_script('document.getElementById("cpdomain").value = "TESTING";')
-    # scorm_id = random_prefix + "_Automatisierung"
+    ###driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "CONTENTTEST";')
+    ###driver.execute_script('document.getElementById("cpdomain").value = "TESTING";')
+
     driver.execute_script('document.getElementById("contentPackageID").value = "' + scorm_id + '";')
 
     # **************************************************************
@@ -84,7 +102,7 @@ def start_upload(file_path):
     # **************************************************************
 
     driver.find_element(By.ID, 'addNewItem').click()
-
+    time.sleep(2)
     driver.find_element(By.ID, 'componentTypeID').send_keys("ELEARNING")
     driver.find_element(By.ID, 'autoGenCompID').click()
     driver.find_element(By.ID, 'componentID').send_keys(scorm_id)
@@ -92,14 +110,27 @@ def start_upload(file_path):
 
     driver.find_element(By.ID, 'componentTitle').send_keys(scorm_id)
     driver.find_element(By.ID, 'requirementType').send_keys("Optional")
-    driver.find_element(By.ID, 'domain1').send_keys("Domain for Testing")
+
+    # LMS-Spezifische Settings
+    if lms == 'lidl':
+        driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "CONTENTTEST";')
+        driver.execute_script('document.getElementById("cpdomain").value = "TESTING";')
+        driver.find_element(By.ID, 'domain1').send_keys("Domain for Testing")
+        next_action('onlineCompletionStatus', 'TEST_COMPL')
+    elif lms == 'schwarz':
+        #driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "Anbindung an Q-SFTP EContent Testing (Q-SFTP-SDL_EContent-Testing)";')
+        next_action('contentDeploymentLocationID', 'Anbindung an Q-SFTP EContent Testing (Q-SFTP-SDL_EContent-Testing)')
+        driver.execute_script('document.getElementById("cpdomain").value = "TST";')
+        #driver.find_element(By.ID, 'domain1').send_keys("TST")
+        time.sleep(2)
+        next_action('onlineCompletionStatus', 'E_LEARNING_Abgeschlossen (E-Learning completed) - For Credit')
 
     driver.find_element(By.ID, 'reviewable').click()
     driver.find_element(By.ID, 'markCompleteUI').click()
     driver.find_element(By.ID, 'skipContentStructurePage').click()
     driver.find_element(By.ID, 'recordWhenLastObjectPassed').click()
-    next_action('onlineCompletionStatus', 'TEST_COMPL')
     time.sleep(2)
+
     #driver.find_element(By.ID, 'componentID').send_keys(scorm_id)
     driver.find_element(By.ID, 'finishButton').click()
 
@@ -145,7 +176,10 @@ def start_upload(file_path):
     print(scorm_id)
     we.add_items_to_upload_sheet(os.path.dirname(file_path), scorm_id)
 
-    driver.get(manage_assignments_url)
+    if lms == 'lidl':
+        driver.get(manage_assignments_url)
+    elif lms == 'schwarz':
+        driver.get(manage_assignments_url_s)
 
     # Manage User Learning - Form
     # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.NAME, 'studentNeedsForm')))
@@ -176,7 +210,11 @@ def start_upload(file_path):
     time.sleep(2)
     next_action('runOnline', 'click')
     time.sleep(2)
-    driver.get(startpage_url)
+
+    if lms == 'lidl':
+        driver.get(startpage_url)
+    elif lms == 'schwarz':
+        driver.get(startpage_url_s)
 
 
 def next_action(id, action):
@@ -192,9 +230,17 @@ def next_action(id, action):
 def read_upload_sheet(path):
     print("report_path: ", path)
     upload_files = we.lms_upload_sheet(path)
-    initialize()
-    for file in upload_files:
-        start_upload(file)
+
+    # check wich LMS System(s)
+    if gui.checkbox_lidl_lms.get():
+        initialize('lidl')
+        for file in upload_files:
+            start_upload(file, 'lidl')
+
+    if gui.checkbox_schwarz_lms.get():
+        initialize('schwarz')
+        for file in upload_files:
+            start_upload(file, 'schwarz')
 
     gui.clearLabels()
     gui.setLabelStatus('LMS-Upload succsessful!', '#00ff00')
