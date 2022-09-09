@@ -6,7 +6,6 @@ import scormZipper as sz
 import writeExcel as we
 from pathlib import Path
 import mediainfo
-# import lms_upload as lms
 import gui
 import disable_time_score as dts
 import lms_upload
@@ -21,7 +20,6 @@ report_path = ""
 report_saved = False
 new_scorm_zip = False
 files_to_upload = []
-#global checkbox_svg, label_characters, SCORM_2004_4, new_scorm_zip, label_scorm, label_namespace, label_item
 
 def saveImsmanifest(rootnode, path):
     with open(path, 'w') as f:
@@ -135,7 +133,6 @@ def runChecks(path):
 
     ### check for adlnav namespace in manifest
     if SCORM_2004_4:
-        # new_scorm_zip = False
         test = rootnode.getAttribute("xmlns:adlnav")
         # add adlnav attribute to manifest
         if test == "":
@@ -216,8 +213,6 @@ def selectFiles():
 
     if len(gui.root.filenames) == 1:
         report_path = os.path.dirname(gui.root.filenames[0])
-        #zip_files = []
-        #zip_files.append(str(gui.root.filenames[0]))
         media_path = runChecks(sz.extractScorm(gui.root.filenames[0]))
         if gui.checkbox_media_test.get():
             mediainfo.checkMediaFiles([media_path], gui.checkbox_svg.get())
@@ -228,7 +223,6 @@ def selectFiles():
 
     # MULTIPLE FILES SELECTED
     elif len(gui.root.filenames) > 1:
-        #global multi_files_select, report_path, report_saved
         multi_files_select = True
         report_path = os.path.dirname(gui.root.filenames[0])
         report_saved = we.createReport(report_path)

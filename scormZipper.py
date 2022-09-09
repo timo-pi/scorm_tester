@@ -18,17 +18,6 @@ def retrieve_file_paths(dirName):
     # return all paths
     return filePaths
 
-"""def zipScorm(filePaths, zip_filename):
-    print("zip_filename: " + str(zip_filename))
-    # writing files to a zipfile
-    zip_file = zipfile.ZipFile(zip_filename, 'w')
-    with zip_file:
-        # writing each file one by one
-        for file in filePaths:
-            zip_file.write(file)
-    print(zip_filename + ' file is created successfully!')
-    zip_file.close()"""
-
 def zipDir(dir_name, out_filename):
     print("Creating new SCORM package in directory " + str(Path(dir_name).parent.parent) + "...")
     #print(Path(dir_name).parent.parent)
@@ -58,13 +47,5 @@ def extractScorm(zip_file):
             # Create the full filepath by using os module.
             filePath = os.path.join(root, filename)
             os.remove(filePath)"""
-
-
-"""def createZipPath():
-    filename = os.path.basename(zip_file)
-    dirname = os.path.dirname(zip_file)
-    extract_path = os.path.join(dirname, 'temp', filename)
-    extracted_scorm_path = extract_path[:-4]"""
-
 
 

@@ -11,15 +11,14 @@ from configparser import ConfigParser
 import gui
 import writeExcel as we
 
-#file_path = r'C:\Users\piechotta\Downloads'
-#file_name = r"Testpaket_2.zip"
-#sf_url = 'https://hcm12preview.sapsf.eu/login?company=lidlstiftuT3&loginMethod=PWD#/login'
-
+# Settings
 config = ConfigParser()
 config.read('.\scormtester.ini')
 user_name = config.get('login', 'username')
 sf_password = config.get('login', 'password')
 wait_time = config.getint('settings', 'wait_time')
+email = config.get('settings', 'email')
+lms_send_mail = config.getboolean('settings', 'lms_send_mail')
 # Lidl URLs
 login_url = config.get('lidl','login_url')
 startpage_url = config.get('lidl', 'startpage_url')
@@ -32,11 +31,12 @@ startpage_url_s = config.get('schwarz', 'startpage_url')
 admin_center_url_s= config.get('schwarz', 'admin_center_url')
 import_content_url_s = config.get('schwarz','import_content_url')
 manage_assignments_url_s = config.get('schwarz', 'manage_assignments_url')
-
-testusers = config.get('settings', 'testusers')
+# Testusers
+testusers = config.get('lidl', 'testusers')
 testuser_list = testusers.split (',')
-email = config.get('settings', 'email')
-lms_send_mail = config.getboolean('settings', 'lms_send_mail')
+testusers_s = config.get('schwarz', 'testusers')
+testuser_list_s = testusers_s.split (',')
+
 scorm_id = ''
 random_prefix = ''
 driver = ''
@@ -92,8 +92,6 @@ def start_upload(file_path, lms):
             $('#configureSettings').show();
             $('#breadCrumbStep3').show();
     ''')
-    ###driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "CONTENTTEST";')
-    ###driver.execute_script('document.getElementById("cpdomain").value = "TESTING";')
 
     driver.execute_script('document.getElementById("contentPackageID").value = "' + scorm_id + '";')
 
@@ -116,12 +114,11 @@ def start_upload(file_path, lms):
         driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "CONTENTTEST";')
         driver.execute_script('document.getElementById("cpdomain").value = "TESTING";')
         driver.find_element(By.ID, 'domain1').send_keys("Domain for Testing")
-        next_action('onlineCompletionStatus', 'TEST_COMPL')
+        time.sleep(2)
+        next_action('onlineCompletionStatus', 'TEST_COMPL (Passed) - For Credit')
     elif lms == 'schwarz':
-        #driver.execute_script('document.getElementById("contentDeploymentLocationID").value = "Anbindung an Q-SFTP EContent Testing (Q-SFTP-SDL_EContent-Testing)";')
         next_action('contentDeploymentLocationID', 'Anbindung an Q-SFTP EContent Testing (Q-SFTP-SDL_EContent-Testing)')
         driver.execute_script('document.getElementById("cpdomain").value = "TST";')
-        #driver.find_element(By.ID, 'domain1').send_keys("TST")
         time.sleep(2)
         next_action('onlineCompletionStatus', 'E_LEARNING_Abgeschlossen (E-Learning completed) - For Credit')
 
@@ -130,12 +127,8 @@ def start_upload(file_path, lms):
     driver.find_element(By.ID, 'skipContentStructurePage').click()
     driver.find_element(By.ID, 'recordWhenLastObjectPassed').click()
     time.sleep(2)
-
-    #driver.find_element(By.ID, 'componentID').send_keys(scorm_id)
     driver.find_element(By.ID, 'finishButton').click()
-
     time.sleep(2)
-    # Wait until upload is finished
     next_action('editContentObjectIDIcon', 'wait')
     time.sleep(2)
     next_action('editContentObjectIDIcon', 'click')
@@ -174,15 +167,12 @@ def start_upload(file_path, lms):
         print('Warning: Unable to read deployment status.')
 
     print(scorm_id)
-    we.add_items_to_upload_sheet(os.path.dirname(file_path), scorm_id)
+    we.add_items_to_upload_sheet(os.path.dirname(file_path), scorm_id, lms)
 
     if lms == 'lidl':
         driver.get(manage_assignments_url)
     elif lms == 'schwarz':
         driver.get(manage_assignments_url_s)
-
-    # Manage User Learning - Form
-    # WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.NAME, 'studentNeedsForm')))
 
     time.sleep(wait_time)
 
@@ -191,11 +181,16 @@ def start_upload(file_path, lms):
     next_action('studentId', 'click')
 
     # Assign Testusers
-
-    for user in testuser_list:
-        next_action('studentId', user)
-        next_action('submitbutton', 'click')
-        time.sleep(2)
+    if lms == 'lidl':
+        for user in testuser_list:
+            next_action('studentId', user)
+            next_action('submitbutton', 'click')
+            time.sleep(2)
+    elif lms == 'schwarz':
+        for user in testuser_list_s:
+            next_action('studentId', user)
+            next_action('submitbutton', 'click')
+            time.sleep(2)
 
     next_action('nextButton', 'click')
     time.sleep(2)
@@ -231,7 +226,7 @@ def read_upload_sheet(path):
     print("report_path: ", path)
     upload_files = we.lms_upload_sheet(path)
 
-    # check wich LMS System(s)
+    # check which LMS System(s)
     if gui.checkbox_lidl_lms.get():
         initialize('lidl')
         for file in upload_files:
