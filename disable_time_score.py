@@ -102,7 +102,7 @@ def disable_time_score(path):
         print("Articulate Storyline Content detected!")
         os.path.join(path, r'lms\SCORM2004Functions.js')
         storyline_path = os.path.join(path, r'lms\SCORMFunctions.js')
-        result = change_articulate_scormdriver(storyline_path)
+        result = change_storyline_scormdriver(storyline_path)
         return result
     else:
         print("No Articulate or TTKF Content found!")
