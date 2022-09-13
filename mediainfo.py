@@ -39,16 +39,21 @@ def checkImage(file):
     values.append(['File Size', str(size)])
 
     # get image dimensions
-    if file[-3:] != 'svg':
-        img = Image.open(file)
-        width, height = img.size
-        values.append(['Image Width', str(width)])
-        values.append(['Image Height', str(height)])
-    if file[-3:] == 'peg':
-        values.append(['File Type', 'JPEG'])
-    else:
-        values.append(['File Type', file[-3:].upper()])
-    return values
+    try:
+        if file[-3:] != 'svg':
+            img = Image.open(file)
+            width, height = img.size
+            values.append(['Image Width', str(width)])
+            values.append(['Image Height', str(height)])
+        if file[-3:] == 'peg':
+            values.append(['File Type', 'JPEG'])
+        else:
+            values.append(['File Type', file[-3:].upper()])
+        return values
+    except:
+        values.append(['Image Width', 'ERROR'])
+        values.append(['Image Height', 'ERROR'])
+        return values
 
 def changeExcelColumnWidth(ws):
     cell = ['A','B','C','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T']
@@ -60,7 +65,6 @@ def changeExcelColumnWidth(ws):
 
 def write_to_excel(media_data, unzip_dir):
     parent_path = Path(unzip_dir).parent
-    #report_path = os.path.join(parent_path.parent, os.path.basename(os.path.dirname(unzip_dir)))
     report_path = Path(parent_path).parent
     restore_cwd = os.getcwd()
     os.chdir(report_path)
@@ -150,25 +154,25 @@ def checkMediaFiles(directories, svg_exclude):
         report = []
         # list of all media file paths (to put into report)
         file_paths = []
-        exclude = set(['com.tts.player'])
+        exclude = {'__MACOSX'}
+        exclude_tts = {'com.tts.player', '__MACOSX'}
         for folder, subfolders, filenames in os.walk(unzip_dir, topdown=True):
             if svg_exclude:
+                subfolders[:] = [d for d in subfolders if d not in exclude_tts]
+            else:
                 subfolders[:] = [d for d in subfolders if d not in exclude]
             for file in filenames:
                 # search for images, videos, audios (checkbox svg due to massive .svg files in ttkf projects!)
                 if file.endswith('.svg'):
-                    #print(os.path.join(folder, file).replace('/', '\\'))
                     report.append(checkImage(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                 elif file.endswith('.png') or file.endswith('.jpg') or file.endswith('.gif') or file.endswith('.jpeg') or file.endswith('.bmp') or file.endswith('.tiff') or file.endswith('.tif') or file.endswith('.avif') or file.endswith('.webp'):
                     report.append(checkImage(os.path.join(folder, file).replace('/', '\\')))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                 elif file.endswith('.mpeg') or file.endswith('.mp4') or file.endswith('.mov') or file.endswith('.ogg') or file.endswith('.avi') or file.endswith('.wmv') or file.endswith('.mkv') or file.endswith('.flv') or file.endswith('.swf') or file.endswith('pdf'):
-                    #print(os.path.join(folder, file).replace('/', '\\'))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                     report.append(checkAudioVideo(os.path.join(folder, file).replace('/', '\\')))
                 elif file.endswith('.mp3') or file.endswith('.ogv') or file.endswith('.aac') or file.endswith('.wav') or file.endswith('.mpg') or file.endswith('.mpeg') or file.endswith('.m2v'):
-                    #print(os.path.join(folder, file).replace('/', '\\'))
                     file_paths.append(os.path.join(folder, file).replace('/', '\\'))
                     report.append(checkAudioVideo(os.path.join(folder, file).replace('/', '\\')))
     # create report for each unzipped SCORM package
