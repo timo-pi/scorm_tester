@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, IntVar, Checkbutton, Tk, ttk
 import lms_upload
 
-version = "v3.0 | 31.08.2022"
+version = "v3.2| 14.09.2022"
 
 check_media_files = True
 
