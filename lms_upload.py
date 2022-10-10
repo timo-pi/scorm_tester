@@ -50,13 +50,13 @@ def initialize(lms):
     if lms == 'lidl':
         driver.get(login_url)
         # Login
-        next_action('__input1-inner', 'wait')
-        name_field = driver.find_element(By.ID, '__input1-inner')
-        password_field = driver.find_element(By.ID, '__input2-inner')
+        next_action('j_username', 'wait')
+        name_field = driver.find_element(By.ID, 'j_username')
+        password_field = driver.find_element(By.ID, 'j_password')
         name_field.send_keys(user_name)
         password_field.send_keys(sf_password)
-        next_action('__button2-inner', 'wait')
-        driver.find_element(By.ID, '__button2-inner').click()
+        next_action('logOnFormSubmit', 'wait')
+        driver.find_element(By.ID, 'logOnFormSubmit').click()
     elif lms == 'schwarz':
         # SSO-Link
         driver.get(login_url_s)
