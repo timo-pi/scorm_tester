@@ -64,9 +64,9 @@ def initialize(lms):
 
 def start_upload(file_path, lms):
     global scorm_id
-    global random_prefix
+    #global random_prefix
+    #random_prefix = str(random.uniform(0, 1))[2:6]
 
-    random_prefix = str(random.uniform(0, 1))[2:6]
     scorm_id = random_prefix + "_" + str(os.path.basename(file_path))[:-4]
 
     # open Admin-Page
@@ -104,7 +104,9 @@ def start_upload(file_path, lms):
     driver.find_element(By.ID, 'componentTypeID').send_keys("ELEARNING")
     driver.find_element(By.ID, 'autoGenCompID').click()
     driver.find_element(By.ID, 'componentID').send_keys(scorm_id)
-    driver.find_element(By.ID, 'componentIDPrefix').send_keys(random_prefix)
+
+    #driver.find_element(By.ID, 'componentIDPrefix').send_keys(random_prefix)
+    driver.find_element(By.ID, 'componentIDPrefix').send_keys(scorm_id)
 
     driver.find_element(By.ID, 'componentTitle').send_keys(scorm_id)
     driver.find_element(By.ID, 'requirementType').send_keys("Optional")
@@ -223,6 +225,9 @@ def next_action(id, action):
         driver.find_element(By.ID, id).send_keys(action)
 
 def read_upload_sheet(path):
+    global random_prefix
+    random_prefix = str(random.uniform(0, 1))[2:6]
+
     print("report_path: ", path)
     upload_files = we.lms_upload_sheet(path)
 
@@ -238,4 +243,5 @@ def read_upload_sheet(path):
             start_upload(file, 'schwarz')
 
     gui.clearLabels()
-    gui.setLabelStatus('LMS-Upload succsessful!', '#00ff00')
+    gui_message = 'LMS-Upload succsessful! Prefix: ' + random_prefix
+    gui.setLabelStatus(gui_message, '#00ff00')

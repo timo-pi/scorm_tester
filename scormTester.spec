@@ -8,7 +8,7 @@ a = Analysis(
     ['scormTester.py'],
     pathex=[],
     binaries=[],
-    datas=[('writeExcel.py', '.'), ('xmlHelper.py', '.'), ('scormZipper.py', '.'), ('mediainfo.py', '.'), ('gui.py', '.'), ('exiftool.exe', '.'), ('run_20.js', '.'), ('run_21.js', '.'), ('disable_time_score.py', '.')],
+    datas=[('writeExcel.py', '.'), ('xmlHelper.py', '.'), ('scormZipper.py', '.'), ('mediainfo.py', '.'), ('gui.py', '.'), ('exiftool.exe', '.'), ('run_20.js', '.'), ('run_21.js', '.'), ('disable_time_score.py', '.'), ('lms_upload.py', '.'), ('scormtester.ini', '.'), ('msedgedriver.exe', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
